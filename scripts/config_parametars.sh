@@ -11,15 +11,19 @@ EOF
 
 app_back_config_value=$(cat <<EOF
 ENV=$app_env
-DB_HOST=mysql
-DB_PORT=3306
+PORT=$app_back_port_inside_container
+
 DB_USER=<<DB_USER>>
-DB_PASS=<<DB_PASS>>
-DB_NAME=pixlize
+DB_PASS="<<DB_PASS>>"
+
+DB_HOST=${rds_db[host]}
+DB_PORT=${rds_db[port]}
+DB_NAME=${rds_db[name]}
 
 JWT_SECRET=<<JWT_SECRET>>
 
 AWS_REGION=$region
+
 AWS_ACCESS_KEY_ID=test
 AWS_SECRET_ACCESS_KEY=test
 AWS_ENDPOINT=http://localstack:4566
@@ -28,9 +32,6 @@ S3_BUCKET_NAME=pixlize-images
 SQS_QUEUE_URL=http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/pixlize-jobs
 SNS_TOPIC_ARN=arn:aws:sns:us-east-1:000000000000:pixlize-notifications
 SNS_WEBHOOK_URL=http://backend:3000/webhooks/sns
-
-NODE_ENV=development
-PORT=3000
 FRONTEND_URL=http://localhost:5173
 
 EOF
@@ -154,3 +155,4 @@ EOF
 create_secret "${app_back_jwt_secret[name]}" "$app_back_jwt_secret_value_json"
 app_back_jwt_secret[arn]="$rt"
 
+print_sperator

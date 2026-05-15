@@ -102,13 +102,32 @@ function create_db_instance(){
             echo "Error while creating DB instance"
             exit 1
         fi
+
+        echo "DB instance $1 is created successfully"
     fi
 
 
-    rt=$(echo "$db" | jq -r ".MasterUserSecret.SecretArn")
+    echo "Fetching DB secret name"
 
-    echo "DB instance $1 is created successfully"
-    echo "$rt"
+    secret_arn=$(echo "$db" | jq -r ".MasterUserSecret.SecretArn")
+
+    secret_name=$(aws secretsmanager list-secrets \
+                --query "SecretList[?ARN=='$secret_arn'] | [0] | Name" \
+                --output text)
+    
+    if ! [ $? -eq 0 ] || [ "$secret_name" = "None" ];
+    then
+            echo "Error while creating DB instance"
+            exit 1
+    fi
+    
+
+    rt1="$secret_name"
+    rt2="$secret_arn"
+    rt3=$(echo "$db" | jq -r ".Endpoint.Address")
+    rt4=$(echo "$db" | jq -r ".Endpoint.Port")
+
+
 }
 
 
@@ -117,6 +136,11 @@ create_db_subnet_group "$db_subnet_group_name" "${subnet_private_3[id]} ${subnet
 print_sperator
 
 create_db_instance  "$db_name" "$db_subnet_group_name" "$db_instance_class" "$engine" "$master_username" "$storage_type" "$allocated_storage" "${sg_db[id]}" "$db_name"
-db_master_user_secret_arn="$rt"
+declare -A rds_db
+rds_db[name]="$db_name"
+rds_db[secret_name]="$rt1"
+rds_db[secret_arn]="$rt2"
+rds_db[host]="$rt3"
+rds_db[port]="$rt4"
 
 print_sperator

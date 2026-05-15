@@ -10,3 +10,5 @@ az2=eu-west-3b
 prefix="$app-$env"
 
 app_env="production"
+
+app_back_port_inside_container="3000"

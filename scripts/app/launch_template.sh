@@ -47,7 +47,7 @@ app_back_instance_role[policy_document]=$(cat <<EOF
             "Sid": "S2",
             "Effect": "Allow",
             "Action": "secretsmanager:GetSecretValue",
-            "Resource": "$db_master_user_secret_arn"
+            "Resource": "${rds_db[secret_arn]}"
         },
         {
             "Sid": "S3",
@@ -255,10 +255,6 @@ EOF
     keys=("<<KeyName>>" "<<ImageId>>" "<<InstanceType>>" "<<UserData>>" "<<SecurityGroupIds>>" "<<VolumeSize>>" "<<VolumeType>>" "<<IamInstanceProfileArn>>")
     values=("$@") 
 
-   
-    values[3]=$(cat "./app/user_data_scripts/${values[3]}.sh" | base64 -w 0)
-
-
     for i in "${!keys[@]}"; do
         launch_template_data=$(echo "${launch_template_data//${keys[$i]}/${values[$i]}}")
     done
@@ -419,7 +415,22 @@ app_front_instance_role[instance_profile_arn]=$rt
 
 print_sperator
 
-create_launch_tamplate_data "$key_name" "$imageId" "$instance_type" "app_back_user_data" "${sg_app_back_end[id]}" "$volume_size" "$volume_type" "${app_back_instance_role[instance_profile_arn]}"
+
+back_launch_tamplate[user_data]=$(cat "./app/user_data_scripts/app_back_user_data.sh")
+
+
+keys_to_replace=("<<jwt_secret_name>>" "<<db_secret_name>>" "<<parametar_config_name>>")
+values_to_replace=("${app_back_jwt_secret[name]}" "${rds_db[secret_name]}" "$app_back_config_name")
+
+
+for i in "${!keys_to_replace[@]}"; do
+    back_launch_tamplate[user_data]=$(echo "${back_launch_tamplate[user_data]//${keys_to_replace[$i]}/${values_to_replace[$i]}}")
+done
+
+back_launch_tamplate[user_data]=$(echo "${back_launch_tamplate[user_data]}" | base64 -w 0)
+
+
+create_launch_tamplate_data "$key_name" "$imageId" "$instance_type" "${back_launch_tamplate[user_data]}" "${sg_app_back_end[id]}" "$volume_size" "$volume_type" "${app_back_instance_role[instance_profile_arn]}"
 back_launch_tamplate[data]="$rt"
 
 create_launch_tamplate "${back_launch_tamplate[name]}" "${back_launch_tamplate[data]}"
@@ -427,8 +438,11 @@ back_launch_tamplate[id]="$rt"
 
 print_sperator
 
+front_launch_tamplate[user_data]=$(cat "./app/user_data_scripts/app_front_user_data.sh")
 
-create_launch_tamplate_data "$key_name" "$imageId" "$instance_type" "app_front_user_data" "${sg_app_front_end[id]}" "$volume_size" "$volume_type" "${app_front_instance_role[instance_profile_arn]}"
+front_launch_tamplate[user_data]=$(echo "${front_launch_tamplate[user_data]}" | base64 -w 0)
+
+create_launch_tamplate_data "$key_name" "$imageId" "$instance_type" "${front_launch_tamplate[user_data]}" "${sg_app_front_end[id]}" "$volume_size" "$volume_type" "${app_front_instance_role[instance_profile_arn]}"
 front_launch_tamplate[data]="$rt"
 
 create_launch_tamplate "${front_launch_tamplate[name]}" "${front_launch_tamplate[data]}"
