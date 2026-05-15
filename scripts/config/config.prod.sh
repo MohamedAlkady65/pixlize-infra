@@ -8,3 +8,5 @@ az1=eu-west-3a
 az2=eu-west-3b
 
 prefix="$app-$env"
+
+app_env="production"

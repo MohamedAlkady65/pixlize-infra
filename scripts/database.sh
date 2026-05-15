@@ -91,6 +91,7 @@ function create_db_instance(){
                 --storage-type "$6" \
                 --allocated-storage "$7"  \
                 --vpc-security-group-ids "$8" \
+                --db-name "$9" \
                 --no-publicly-accessible \
                 --query "DBInstance"\
                 --output json
@@ -115,7 +116,7 @@ create_db_subnet_group "$db_subnet_group_name" "${subnet_private_3[id]} ${subnet
 
 print_sperator
 
-create_db_instance  "$db_name" "$db_subnet_group_name" "$db_instance_class" "$engine" "$master_username" "$storage_type" "$allocated_storage" "${sg_db[id]}"
+create_db_instance  "$db_name" "$db_subnet_group_name" "$db_instance_class" "$engine" "$master_username" "$storage_type" "$allocated_storage" "${sg_db[id]}" "$db_name"
 db_master_user_secret_arn="$rt"
 
 print_sperator

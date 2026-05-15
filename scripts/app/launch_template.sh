@@ -1,12 +1,3 @@
-
-# create key
-# create role
-# load user data, replace, encode
-
-# declare -p > vars_state.sh
-source vars_state.sh
-
-
 key_name="$prefix-app-instance-key"
 imageId="ami-0be40a46b4111e7f5"
 instance_type="t2.medium"
@@ -38,7 +29,7 @@ declare -A app_back_instance_role
 
 app_back_instance_role[name]="$prefix-app-back-instance-role"
 
-app_back_instance_role[instance_profile_name]="$prefix-app-back-instance-profile"
+app_back_instance_role[instance_profile_name]="${app_back_instance_role[name]}"
 
 app_back_instance_role[policy_name]="${app_back_instance_role[name]}-policy"
 
@@ -61,6 +52,12 @@ app_back_instance_role[policy_document]=$(cat <<EOF
         {
             "Sid": "S3",
             "Effect": "Allow",
+            "Action": "secretsmanager:GetSecretValue",
+            "Resource": "${app_back_jwt_secret[arn]}"
+        },
+        {
+            "Sid": "S4",
+            "Effect": "Allow",
             "Action": "ssm:GetParameter",
             "Resource": "$app_back_config_arn"
         }
@@ -74,7 +71,7 @@ declare -A app_front_instance_role
 
 app_front_instance_role[name]="$prefix-app-front-instance-role"
 
-app_front_instance_role[instance_profile_name]="$prefix-app-front-instance-profile"
+app_front_instance_role[instance_profile_name]="${app_front_instance_role[name]}"
 
 app_front_instance_role[policy_name]="${app_front_instance_role[name]}-policy"
 
@@ -259,7 +256,7 @@ EOF
     values=("$@") 
 
    
-    values[3]=$(cat "./app/user_data_scripts/${values[3]}.sh" | base64)
+    values[3]=$(cat "./app/user_data_scripts/${values[3]}.sh" | base64 -w 0)
 
 
     for i in "${!keys[@]}"; do
