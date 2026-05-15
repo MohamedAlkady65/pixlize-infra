@@ -1,4 +1,5 @@
-db_name="$prefix-db"
+db_name_instance="$prefix-db1"
+db_name="${app}_${env}_db1"
 db_subnet_group_name="$prefix-db-subnet-group"
 db_instance_class="db.t3.micro"
 engine=mysql
@@ -51,7 +52,7 @@ function create_db_subnet_group(){
 
 
 function create_db_instance(){
-    # 1 db_name
+    # 1 db_name_instance
     # 2 db_subnet_group_name
     # 3 db_instance_class
     # 4 engine
@@ -135,8 +136,9 @@ create_db_subnet_group "$db_subnet_group_name" "${subnet_private_3[id]} ${subnet
 
 print_sperator
 
-create_db_instance  "$db_name" "$db_subnet_group_name" "$db_instance_class" "$engine" "$master_username" "$storage_type" "$allocated_storage" "${sg_db[id]}" "$db_name"
+create_db_instance  "$db_name_instance" "$db_subnet_group_name" "$db_instance_class" "$engine" "$master_username" "$storage_type" "$allocated_storage" "${sg_db[id]}" "$db_name"
 declare -A rds_db
+rds_db[instance_name]="$db_name_instance"
 rds_db[name]="$db_name"
 rds_db[secret_name]="$rt1"
 rds_db[secret_arn]="$rt2"

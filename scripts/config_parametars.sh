@@ -11,7 +11,7 @@ EOF
 
 app_back_config_value=$(cat <<EOF
 ENV=$app_env
-PORT=$app_back_port_inside_container
+PORT=$app_back_port_in_container
 
 DB_USER=<<DB_USER>>
 DB_PASS="<<DB_PASS>>"

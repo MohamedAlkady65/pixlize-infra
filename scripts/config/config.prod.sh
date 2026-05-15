@@ -11,4 +11,5 @@ prefix="$app-$env"
 
 app_env="production"
 
-app_back_port_inside_container="3000"
+app_back_port_in_container="3000"
+app_back_port_in_host="80"

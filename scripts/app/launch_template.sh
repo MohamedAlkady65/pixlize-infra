@@ -419,8 +419,8 @@ print_sperator
 back_launch_tamplate[user_data]=$(cat "./app/user_data_scripts/app_back_user_data.sh")
 
 
-keys_to_replace=("<<jwt_secret_name>>" "<<db_secret_name>>" "<<parametar_config_name>>")
-values_to_replace=("${app_back_jwt_secret[name]}" "${rds_db[secret_name]}" "$app_back_config_name")
+keys_to_replace=("<<jwt_secret_name>>" "<<db_secret_name>>" "<<parametar_config_name>>" "<<port_in_container>>" "<<port_in_host>>")
+values_to_replace=("${app_back_jwt_secret[name]}" "${rds_db[secret_name]}" "$app_back_config_name" "$app_back_port_in_container" "$app_back_port_in_host")
 
 
 for i in "${!keys_to_replace[@]}"; do

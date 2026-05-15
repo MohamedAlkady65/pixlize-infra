@@ -3,7 +3,8 @@
 jwt_secret_name="<<jwt_secret_name>>"
 db_secret_name="<<db_secret_name>>"
 parametar_config_name="<<parametar_config_name>>"
-
+port_in_container="<<port_in_container>>"
+port_in_host="<<port_in_host>>"
 
 echo "Chandge Dir to /home/ubuntu"
 cd /home/ubuntu
@@ -143,3 +144,6 @@ echo "$parametar_config" > ".env"
 ##############################
 
 echo "Start Service"
+
+docker build -t app  .
+docker container run -d --name app -p "$port_in_host:$port_in_container"  app

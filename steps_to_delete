@@ -1,0 +1,16 @@
+remove nat
+remove database
+
+remove launch templates
+
+remove ec2 roles
+
+remove parametars
+
+remove jwt secret
+
+remove vpc
+
+remove nat ip
+
+remove db subnet group
