@@ -1,0 +1,1 @@
+source ./app/launch_template.sh

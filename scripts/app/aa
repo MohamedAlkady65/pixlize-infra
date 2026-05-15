@@ -1,0 +1,29 @@
+{
+  "KeyName": "alkady-vm",
+  "ImageId": "ami-0be40a46b4111e7f5",
+  "InstanceType": "t2.medium",
+  "UserData": "ZWNobyAiSGVsbG8i",
+  "MetadataOptions": {
+    "HttpEndpoint": "enabled",
+    "HttpPutResponseHopLimit": 2,
+    "HttpTokens": "required"
+  },
+  "SecurityGroupIds": [
+    "sg-09c5a82f11055fa6f"
+  ],
+  "BlockDeviceMappings": [
+    {
+      "DeviceName": "/dev/sda1",
+      "Ebs": {
+        "Encrypted": false,
+        "DeleteOnTermination": true,
+        "SnapshotId": "snap-0a821586bbe6b0783",
+        "VolumeSize": 15,
+        "VolumeType": "gp3"
+      }
+    }
+  ],
+  "IamInstanceProfile": {
+    "Arn": "arn:aws:iam::595923192190:instance-profile/ec2-secret-manager-github-key"
+  }
+}
