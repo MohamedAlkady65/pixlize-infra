@@ -22,3 +22,5 @@ remove nat ip
 remove db subnet group
 
 remove dns records
+
+remove certificates

@@ -1,6 +1,4 @@
 
-source vars_state.sh
-
 function create_hosted_zone(){
     # $1 domain
 
@@ -24,7 +22,7 @@ function create_hosted_zone(){
 
     if [[ "$check_exists" != "None" ]]; then
         hosted_zone_id="$check_exists"
-        echo "Host zone is already exists"
+        echo "Hosted zone is already exists"
         echo "$hosted_zone_id"
         rt="$hosted_zone_id"
         return 0

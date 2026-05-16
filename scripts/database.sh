@@ -1,5 +1,5 @@
-db_name_instance="$prefix-db1"
-db_name="${app}_${env}_db1"
+db_name_instance="$prefix-db"
+db_name="${app}_${env}_db"
 db_subnet_group_name="$prefix-db-subnet-group"
 db_instance_class="db.t3.micro"
 engine=mysql

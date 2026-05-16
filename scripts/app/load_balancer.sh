@@ -4,7 +4,7 @@ declare -A app_back_tg
 app_back_elb[name]="$prefix-back-elb"
 app_back_elb[subnets]="${subnet_public_1[id]} ${subnet_public_2[id]}"
 app_back_elb[security_group]="${sg_load_balancer_back_end[id]}"
-app_back_elb[port]=80
+app_back_elb[port]=443
 
 app_back_tg[name]="$prefix-back-tg"
 app_back_tg[port]=80
@@ -15,7 +15,7 @@ declare -A app_front_tg
 app_front_elb[name]="$prefix-front-elb"
 app_front_elb[subnets]="${subnet_public_1[id]} ${subnet_public_2[id]}"
 app_front_elb[security_group]="${sg_load_balancer_front_end[id]}"
-app_front_elb[port]=80
+app_front_elb[port]=443
 
 app_front_tg[name]="$prefix-front-tg"
 app_front_tg[port]=80
@@ -131,7 +131,7 @@ app_back_tg[arn]="$rt"
 print_sperator
 
 
-create_load_balancer "${app_back_elb[name]}" "${app_back_elb[subnets]}" "${app_back_elb[security_group]}"
+create_load_balancer "${app_back_elb[name]}" "${app_back_elb[subnets]}" "${app_back_elb[security_group]}" 
 app_back_elb[arn]="$rt1"
 app_back_elb[hosted_zone_id]="$rt2"
 app_back_elb[dns_name]="$rt3"
