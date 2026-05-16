@@ -60,11 +60,17 @@ create_dns_record()
     echo "Create DNS record for domain $1 ..."
 
 
+    if [[ "$1" == *. ]]; then
+        nameToSearch="$1"
+    else
+        nameToSearch="$1."
+    fi
+
     if ! check_exists=$(
         aws route53 list-resource-record-sets \
             --region "$region" \
             --hosted-zone-id "$2" \
-            --query "ResourceRecordSets[?Name == '$1.'] | [0] | Name" \
+            --query "ResourceRecordSets[?Name == '$nameToSearch'] | [0] | Name" \
             --output text
         ); 
     then

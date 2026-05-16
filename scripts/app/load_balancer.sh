@@ -66,7 +66,6 @@ function create_load_balancer(){
         echo "Load balancer $1 is created successfully"
     fi
 
-    echo "$elb"
     rt1=$(echo -n "$elb" | jq -r ".LoadBalancerArn")
     rt2=$(echo -n "$elb" | jq -r ".CanonicalHostedZoneId")
     rt3=$(echo -n "$elb" | jq -r ".DNSName")
