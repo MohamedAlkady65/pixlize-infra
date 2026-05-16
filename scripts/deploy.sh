@@ -13,4 +13,8 @@ source ./vpc.sh
 source ./security.sh
 source ./database.sh
 source ./config_parametars.sh
-source ./app/app.sh
+source ./app/launch_template.sh
+source ./app/load_balancer.sh
+source ./dns.sh
+source ./app/load_balancer_listener.sh
+source ./app/auto_scaling_group.sh

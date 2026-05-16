@@ -1,16 +1,16 @@
 declare -A app_back_asg
 
 app_back_asg[name]="$prefix-back-asg"
-app_back_asg[min]=2
-app_back_asg[max]=5
+app_back_asg[min]=1
+app_back_asg[max]=1
 app_back_asg[subnets]="${subnet_private_1[id]},${subnet_private_2[id]}"
 
 
 declare -A app_front_asg
 
 app_front_asg[name]="$prefix-front-asg"
-app_front_asg[min]=2
-app_front_asg[max]=2
+app_front_asg[min]=1
+app_front_asg[max]=1
 app_front_asg[subnets]="${subnet_private_1[id]},${subnet_private_2[id]}"
 
 
@@ -72,3 +72,5 @@ create_auto_scaling_group "${app_back_asg[name]}" "${back_launch_tamplate[id]}" 
 print_sperator
 
 create_auto_scaling_group "${app_front_asg[name]}" "${front_launch_tamplate[id]}" "${app_front_asg[min]}" "${app_front_asg[max]}" "${app_front_asg[subnets]}" "${app_front_tg[arn]}"
+
+print_sperator

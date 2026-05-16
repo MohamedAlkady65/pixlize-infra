@@ -13,3 +13,9 @@ app_env="production"
 
 app_back_port_in_container="3000"
 app_back_port_in_host="80"
+
+domain="alkady.link"
+
+app_back_domain="api.pixlize.$domain"
+
+app_front_domain="pixlize.$domain"

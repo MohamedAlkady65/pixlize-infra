@@ -1,6 +1,3 @@
-source vars_state.sh
-
-
 declare -A app_back_elb
 declare -A app_back_tg
 
@@ -33,46 +30,48 @@ function create_load_balancer(){
     check_exists=$(
         aws elbv2 describe-load-balancers \
             --region $region \
-            --query "LoadBalancers[0].LoadBalancerArn" \
+            --query "LoadBalancers[0]" \
             --names "$1" \
-            --output text 2>&1
-        ); 
+            --output json 2>&1
+        );
+
     if [ $? -eq 0 ]; then
-        arn="$check_exists"
         echo "Load balancer is already exists"
-        echo "$arn"
-        rt="$arn"
-        return 0
+        elb="$check_exists"
     elif [[ "$check_exists" != *"LoadBalancerNotFound"* ]]; then
         echo "$check_exists" >&2
         echo "Error while creating load balancer"
         exit 1
-    fi
-
-    subnets_ids=($2)
-
-    if ! arn=$(
-        aws elbv2 create-load-balancer \
-            --region "$region" \
-            --name "$1" \
-            --type network \
-            --scheme internet-facing \
-            --subnets "${subnets_ids[@]}" \
-            --security-groups "$3" \
-            --query "LoadBalancers[0].LoadBalancerArn" \
-            --tags "Key=Name,Value=$1" "Key=Env,Value=$env" "Key=App,Value=$app" \
-            --output text
-        ); 
-    then
-        echo "Error while creating load balancer"
-        exit 1
-    fi
+    else 
     
+        subnets_ids=($2)
 
+        if ! elb=$(
+            aws elbv2 create-load-balancer \
+                --region "$region" \
+                --name "$1" \
+                --type network \
+                --scheme internet-facing \
+                --subnets "${subnets_ids[@]}" \
+                --security-groups "$3" \
+                --query "LoadBalancers[0]" \
+                --tags "Key=Name,Value=$1" "Key=Env,Value=$env" "Key=App,Value=$app" \
+                --output json
+            ); 
+        then
+            echo "Error while creating load balancer"
+            exit 1
+        fi
+        
+        echo "Load balancer $1 is created successfully"
+    fi
 
-    echo "Load balancer $1 is created successfully"
-    echo "$arn"
-    rt="$arn"
+    echo "$elb"
+    rt1=$(echo -n "$elb" | jq -r ".LoadBalancerArn")
+    rt2=$(echo -n "$elb" | jq -r ".CanonicalHostedZoneId")
+    rt3=$(echo -n "$elb" | jq -r ".DNSName")
+
+    echo "$rt1"
 }
 
 function create_target_group(){
@@ -126,30 +125,6 @@ function create_target_group(){
     rt="$arn"
 }
 
-function create_listener(){
-    # $1 elb_arn
-    # $2 port
-    # $3 tg_arn
-
-    echo "Create listener $1 to $3 ..."
-
-    if ! output=$(
-        aws elbv2 create-listener \
-            --load-balancer-arn "$1" \
-            --protocol TCP \
-            --port "$2" \
-            --default-actions "Type=forward,TargetGroupArn=$3" \
-            --output text
-        ); 
-    then
-        echo "Error while creating listener"
-        exit 1
-    fi
-    
-
-    echo "Listener is created successfully"
-}
-
 
 create_target_group "${app_back_tg[name]}" "$vpc_id" "${app_back_tg[port]}"
 app_back_tg[arn]="$rt"
@@ -158,14 +133,11 @@ print_sperator
 
 
 create_load_balancer "${app_back_elb[name]}" "${app_back_elb[subnets]}" "${app_back_elb[security_group]}"
-app_back_elb[arn]="$rt"
+app_back_elb[arn]="$rt1"
+app_back_elb[hosted_zone_id]="$rt2"
+app_back_elb[dns_name]="$rt3"
 
 print_sperator
-
-create_listener "${app_back_elb[arn]}" "${app_back_elb[port]}" "${app_back_tg[arn]}"
-
-print_sperator
-
 
 
 
@@ -176,10 +148,8 @@ print_sperator
 
 
 create_load_balancer "${app_front_elb[name]}" "${app_front_elb[subnets]}" "${app_front_elb[security_group]}"
-app_front_elb[arn]="$rt"
-
-print_sperator
-
-create_listener "${app_front_elb[arn]}" "${app_front_elb[port]}" "${app_front_tg[arn]}"
+app_front_elb[arn]="$rt1"
+app_front_elb[hosted_zone_id]="$rt2"
+app_front_elb[dns_name]="$rt3"
 
 print_sperator
