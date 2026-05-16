@@ -8,21 +8,48 @@ app_front_certificate[domain]="$app_front_domain"
 
 function validate_certificate(){
     # $1 certificate_arn
+    # $2 try_number
 
-    echo "Validating certificate ..."
+    try_number="$2"
+
+    if [ "$try_number" = "" ];
+    then
+        echo "Validating certificate ..."
+        try_number=1
+    fi
+
 
     record=$(
         aws acm describe-certificate \
             --certificate-arn "$1" \
-            --query "Certificate.DomainValidationOptions[0].ResourceRecord"\
+            --query "Certificate.DomainValidationOptions[0]"\
             --output "json"
         ); 
 
-    if ! [ $? -eq 0 ] || [ "$record" = "None" ];
+    if ! [ $? -eq 0 ] || [ "$record" = "null" ];
     then
             echo "Error while validating certificate"
             exit 1
     fi
+
+    record=$(echo -n "$record" | jq -r ".ResourceRecord")
+
+    if [ "$record" = "null" ];
+    then
+        try_number="$((try_number+1))"
+
+        if [ $try_number -eq 5 ];
+        then
+            echo "Error while validating certificate"
+            exit 1
+        else    
+                sleep 10
+                validate_certificate "$1" "$try_number"
+            return 0
+        fi
+    fi
+
+    
 
     name=$(echo -n "$record" | jq -r ".Name")
     type=$(echo -n "$record" | jq -r ".Type")
@@ -119,12 +146,12 @@ function create_certificate(){
 }
 
 
-# create_certificate "${app_back_certificate[domain]}"
-# app_back_certificate[arn]="$rt"
+create_certificate "${app_back_certificate[domain]}"
+app_back_certificate[arn]="$rt"
 
-# print_sperator
+print_sperator
 
-# create_certificate "${app_front_certificate[domain]}"
-# app_front_certificate[arn]="$rt"
+create_certificate "${app_front_certificate[domain]}"
+app_front_certificate[arn]="$rt"
 
-# print_sperator
+print_sperator
