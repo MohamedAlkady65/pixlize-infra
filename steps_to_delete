@@ -1,6 +1,12 @@
 remove nat
 remove database
 
+remove load balancers
+
+remove target groups
+
+remove auto scaling groups
+
 remove launch templates
 
 remove ec2 roles

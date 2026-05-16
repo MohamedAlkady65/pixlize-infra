@@ -30,10 +30,18 @@ declare -A subnet_public_1=(
   [route_table]="route_table_public"
 )
 
+declare -A subnet_public_2=(
+  [type]="public"
+  [name]="$prefix-public-2"
+  [cidr]="10.0.2.0/24"
+  [az]="$az2"
+  [route_table]="route_table_public"
+)
+
 declare -A subnet_private_1=(
   [type]="private"
   [name]="$prefix-private-1"
-  [cidr]="10.0.2.0/24"
+  [cidr]="10.0.3.0/24"
   [az]="$az1"
   [route_table]="route_table_private_nat"
 )
@@ -41,7 +49,7 @@ declare -A subnet_private_1=(
 declare -A subnet_private_2=(
   [type]="private"
   [name]="$prefix-private-2"
-  [cidr]="10.0.3.0/24"
+  [cidr]="10.0.4.0/24"
   [az]="$az2"
   [route_table]="route_table_private_nat"
 )
@@ -49,7 +57,7 @@ declare -A subnet_private_2=(
 declare -A subnet_private_3=(
   [type]="private"
   [name]="$prefix-private-3"
-  [cidr]="10.0.4.0/24"
+  [cidr]="10.0.5.0/24"
   [az]="$az1"
   [route_table]="route_table_private"
 )
@@ -57,7 +65,7 @@ declare -A subnet_private_3=(
 declare -A subnet_private_4=(
   [type]="private"
   [name]="$prefix-private-4"
-  [cidr]="10.0.5.0/24"
+  [cidr]="10.0.6.0/24"
   [az]="$az2"
   [route_table]="route_table_private"
 )
@@ -71,6 +79,7 @@ route_tables=(
 
 subnets=(
   "subnet_public_1"
+  "subnet_public_2"
   "subnet_private_1"
   "subnet_private_2"
   "subnet_private_3"

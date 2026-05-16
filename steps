@@ -3,10 +3,11 @@ create vpc
 
 create subnets
 -public (enable auto assign) public-1   az1   10.0.1.0/24  public
--private                     private-1  az1   10.0.2.0/24  priavte-nat
--private                     private-2  az2   10.0.3.0/24  priavte-nat
--private                     private-3  az1   10.0.4.0/24  priavte
--private                     private-4  az2   10.0.5.0/24  priavte
+-public (enable auto assign) public-1   az2   10.0.2.0/24  public
+-private                     private-1  az1   10.0.3.0/24  priavte-nat
+-private                     private-2  az2   10.0.4.0/24  priavte-nat
+-private                     private-3  az1   10.0.5.0/24  priavte
+-private                     private-4  az2   10.0.6.0/24  priavte
 
 create igw
 
@@ -50,14 +51,14 @@ create ec2
         create lunch template
         create target groups of 
         instances (2) with user data in private network in subnets (private-1,private-2)
-        create network load balancer in public network
+        create network load balancer in public_1 public_2 subnets
         create listener to target group
 
     front:
         create lunch template
         create target groups of 
         instances (2) with user data in private network in subnets (private-1,private-2)
-        create network load balancer in public network
+        create network load balancer in public_1 public_2 subnets
         create listener to target group
 
 DNS
@@ -66,3 +67,11 @@ api.pixlize.link => back load balancer
 pixlize.alkady.link => front load balancer
 
 create certificates for domains
+
+
+
+
+========================================
+
+declare -p > vars_state.sh
+source vars_state.sh
