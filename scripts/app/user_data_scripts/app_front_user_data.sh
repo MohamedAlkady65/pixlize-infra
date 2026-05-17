@@ -1,7 +1,7 @@
 #!/bin/bash
 
-parametar_config_name="<<parametar_config_name>>"
-port_in_host="<<port_in_host>>"
+parametar_config_name='<<parametar_config_name>>'
+port_in_host='<<port_in_host>>'
 
 echo "Chandge Dir to /home/ubuntu"
 cd /home/ubuntu

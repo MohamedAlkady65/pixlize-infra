@@ -108,6 +108,9 @@ function create_target_group(){
             --target-type instance \
             --vpc-id $2 \
             --port $3 \
+            --health-check-interval-seconds 10 \
+            --healthy-threshold-count 2 \
+            --unhealthy-threshold-count 4 \
             --query "TargetGroups[0].TargetGroupArn" \
             --tags "Key=Name,Value=$1" "Key=Env,Value=$env" "Key=App,Value=$app" \
             --output text

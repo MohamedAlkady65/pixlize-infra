@@ -1,10 +1,10 @@
 #!/bin/bash
 
-jwt_secret_name="<<jwt_secret_name>>"
-db_secret_name="<<db_secret_name>>"
-parametar_config_name="<<parametar_config_name>>"
-port_in_container="<<port_in_container>>"
-port_in_host="<<port_in_host>>"
+jwt_secret_name='<<jwt_secret_name>>'
+db_secret_name='<<db_secret_name>>'
+parametar_config_name='<<parametar_config_name>>'
+port_in_container='<<port_in_container>>'
+port_in_host='<<port_in_host>>'
 
 echo "Chandge Dir to /home/ubuntu"
 cd /home/ubuntu
