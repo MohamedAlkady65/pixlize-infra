@@ -3,9 +3,9 @@ app_back_config_name="$prefix-app-back-config"
 
 
 app_front_config_value=$(cat <<EOF
-ENV=$app_env
-VITE_API_URL=http://localhost:3000
-VITE_WS_URL=http://localhost:3000
+APP_ENV=$app_env
+APP_API_URL=https://$app_back_domain
+APP_WS_URL=https://$app_back_domain
 EOF
 )
 
@@ -32,7 +32,8 @@ S3_BUCKET_NAME=pixlize-images
 SQS_QUEUE_URL=http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/pixlize-jobs
 SNS_TOPIC_ARN=arn:aws:sns:us-east-1:000000000000:pixlize-notifications
 SNS_WEBHOOK_URL=http://backend:3000/webhooks/sns
-FRONTEND_URL=http://localhost:5173
+
+FRONTEND_URL=https://$app_front_domain
 
 EOF
 )

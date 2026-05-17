@@ -440,6 +440,14 @@ print_sperator
 
 front_launch_tamplate[user_data]=$(cat "./app/user_data_scripts/app_front_user_data.sh")
 
+keys_to_replace=("<<parametar_config_name>>" "<<port_in_host>>")
+values_to_replace=("$app_front_config_name" "$app_front_port_in_host")
+
+
+for i in "${!keys_to_replace[@]}"; do
+    front_launch_tamplate[user_data]=$(echo "${front_launch_tamplate[user_data]//${keys_to_replace[$i]}/${values_to_replace[$i]}}")
+done
+
 front_launch_tamplate[user_data]=$(echo "${front_launch_tamplate[user_data]}" | base64 -w 0)
 
 create_launch_tamplate_data "$key_name" "$imageId" "$instance_type" "${front_launch_tamplate[user_data]}" "${sg_app_front_end[id]}" "$volume_size" "$volume_type" "${app_front_instance_role[instance_profile_arn]}"
