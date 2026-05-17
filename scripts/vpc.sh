@@ -39,19 +39,19 @@ declare -A subnet_public_2=(
 )
 
 declare -A subnet_private_1=(
-  [type]="private"
+  [type]="public"
   [name]="$prefix-private-1"
   [cidr]="10.0.3.0/24"
   [az]="$az1"
-  [route_table]="route_table_private_nat"
+  [route_table]="route_table_public"
 )
 
 declare -A subnet_private_2=(
-  [type]="private"
+  [type]="public"
   [name]="$prefix-private-2"
   [cidr]="10.0.4.0/24"
   [az]="$az2"
-  [route_table]="route_table_private_nat"
+  [route_table]="route_table_public"
 )
 
 declare -A subnet_private_3=(
@@ -73,7 +73,6 @@ declare -A subnet_private_4=(
 
 route_tables=(
     "route_table_private"
-    "route_table_private_nat"
     "route_table_public"
 )
 
@@ -503,9 +502,6 @@ attach_internet_gateway "$igw_id" "$vpc_id"
 print_sperator
 
 
-create_nat_gateway "${subnet_public_1[id]}"
-nat_id="$rt" 
-
 print_sperator
 
 
@@ -519,10 +515,6 @@ for route_table_name in "${route_tables[@]}"; do
 
     if [[ "${route_table[internet]}" == "igw" ]]; then
         add_gateway_to_route_table "${route_table[id]}" "$igw_id"
-    fi
-
-    if [[ "${route_table[internet]}" == "nat" ]]; then
-        add_gateway_to_route_table "${route_table[id]}" "$nat_id"
     fi
 
     print_sperator
