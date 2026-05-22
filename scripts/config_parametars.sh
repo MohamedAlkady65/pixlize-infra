@@ -24,14 +24,9 @@ JWT_SECRET=<<JWT_SECRET>>
 
 AWS_REGION=$region
 
-AWS_ACCESS_KEY_ID=test
-AWS_SECRET_ACCESS_KEY=test
-AWS_ENDPOINT=http://localstack:4566
 
-S3_BUCKET_NAME=pixlize-images
-SQS_QUEUE_URL=http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/pixlize-jobs
-SNS_TOPIC_ARN=arn:aws:sns:us-east-1:000000000000:pixlize-notifications
-SNS_WEBHOOK_URL=http://backend:3000/webhooks/sns
+S3_BUCKET_NAME=$app_bucket_name
+SQS_QUEUE_URL=${app_queue[url]}
 
 FRONTEND_URL=https://$app_front_domain
 

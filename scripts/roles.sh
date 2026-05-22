@@ -45,24 +45,9 @@ function attach_policy_to_role(){
 
 function create_role(){
     # $1 role_name
+    # $2 assume_role_policy_document
 
     echo "Create $1 role ..."
-
-    app_instance_assume_role_document=$(cat <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-EOF
-)
     
     if ! check_exists=$(
         aws iam list-roles \
@@ -83,7 +68,7 @@ EOF
         aws iam create-role \
             --region $region \
             --role-name "$1" \
-            --assume-role-policy-document "$app_instance_assume_role_document" \
+            --assume-role-policy-document "$2" \
             --query "Role" \
             --tags "Key=Name,Value=$1" "Key=Env,Value=$env" "Key=App,Value=$app" \
             --output json

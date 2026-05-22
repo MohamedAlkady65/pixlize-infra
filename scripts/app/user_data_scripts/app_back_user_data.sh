@@ -141,6 +141,8 @@ done
 
 echo "$parametar_config" > ".env"
 
+chown ubuntu:ubuntu .env
+
 ##############################
 
 echo "Start Service"

@@ -10,6 +10,23 @@ back_launch_tamplate[name]="$prefix-app-back-launch-template"
 declare -A front_launch_tamplate
 front_launch_tamplate[name]="$prefix-app-front-launch-template"
 
+
+app_instance_assume_role_document=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+)
+
 declare -A app_back_instance_role
 
 app_back_instance_role[name]="$prefix-app-back-instance-role"
@@ -45,6 +62,18 @@ app_back_instance_role[policy_document]=$(cat <<EOF
             "Effect": "Allow",
             "Action": "ssm:GetParameter",
             "Resource": "$app_back_config_arn"
+        },
+        {
+            "Sid": "S5",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::${app_bucket_name}/*"
+        },
+        {
+            "Sid": "S6",
+            "Effect": "Allow",
+            "Action": "sqs:*",
+            "Resource": "${app_queue[arn]}"
         }
     ]
 }
@@ -309,7 +338,7 @@ print_sperator
 
 
 
-create_role "${app_back_instance_role[name]}" 
+create_role "${app_back_instance_role[name]}" "${app_instance_assume_role_document}"
 app_back_instance_role[id]="$rt1"
 app_back_instance_role[arn]="$rt2"
 
@@ -319,7 +348,7 @@ put_policy_to_role "${app_back_instance_role[name]}" "${app_back_instance_role[p
 
 print_sperator
 
-create_role "${app_front_instance_role[name]}"
+create_role "${app_front_instance_role[name]}" "${app_instance_assume_role_document}"
 app_front_instance_role[id]="$rt1"
 app_front_instance_role[arn]="$rt2"
 

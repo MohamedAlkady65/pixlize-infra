@@ -1,4 +1,5 @@
 account_id=$(aws sts get-caller-identity --query Account --output text)
+account_id="${account_id%$'\n'}"
 
 app_bucket_name="$prefix-app-bucket-$account_id"
 

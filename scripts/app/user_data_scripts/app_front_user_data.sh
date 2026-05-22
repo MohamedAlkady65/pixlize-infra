@@ -112,6 +112,8 @@ parametar_config=$(aws ssm  get-parameter \
 
 echo "$parametar_config" > ".env"
 
+chown ubuntu:ubuntu .env
+
 ##############################
 
 echo "Start Service"

@@ -502,11 +502,6 @@ attach_internet_gateway "$igw_id" "$vpc_id"
 print_sperator
 
 
-print_sperator
-
-
-
-
 for route_table_name in "${route_tables[@]}"; do
     declare -n route_table="$route_table_name"
 

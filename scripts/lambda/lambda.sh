@@ -6,9 +6,57 @@ app_lambda[runtime]="python3.12"
 app_lambda[handler]="handler.lambda_handler"
 
 
+app_lambda_assume_role_document=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "lambda.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+)
+
+
 declare -A app_lambda_role
 app_lambda_role[name]="$prefix-app-lambda-role"
 app_lambda_role[attach_policy_arn]="arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
+app_lambda_role[policy_name]="${app_lambda_role[name]}-policy"
+
+app_lambda_role[policy_document]=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "S1",
+            "Effect": "Allow",
+            "Action": "sns:*",
+            "Resource": "${app_topic[arn]}"
+        },
+        {
+            "Sid": "S2",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::${app_bucket_name}/*"
+        },
+        {
+            "Sid": "S3",
+            "Effect": "Allow",
+            "Action": "sqs:*",
+            "Resource": "${app_queue[arn]}"
+        }
+    ]
+}
+EOF
+)
+
+
 
 function upload_lambda_code_to_bucket(){
     # $1 repo
@@ -17,8 +65,7 @@ function upload_lambda_code_to_bucket(){
 
     repo="$1"
     branch="$2"
-    lambda_code_bucket_name="$3
-    "
+    lambda_code_bucket_name="$3"
     temp_dir="../temp_lambda"
     output_dir="$temp_dir/output"
     src_dir="$temp_dir/src"
@@ -89,6 +136,7 @@ function create_lambda_function(){
 
     if ! check_exists=$(
         aws lambda list-functions \
+            --region $region \
             --query "Functions[?FunctionName == '$1'] | [0].FunctionArn" \
             --output text
         ); 
@@ -108,6 +156,7 @@ function create_lambda_function(){
 
 
     if ! arn=$(aws lambda create-function \
+        --region $region \
         --function-name "$1" \
         --runtime "$2" \
         --role "$3" \
@@ -120,20 +169,95 @@ function create_lambda_function(){
         exit 1
     fi
 
+    if ! output=$(aws lambda wait function-active \
+                --region $region \
+                --function-name "$1"
+                ); 
+    then
+        echo "Error while creating lambda function"
+        exit 1
+    fi
+
+    if ! output=$(aws lambda update-function-configuration \
+                --region $region \
+                --function-name "$1" \
+                --environment "$7"); 
+    then
+        echo "Error while creating lambda function"
+        exit 1
+    fi
+
     echo "Lambda function $1 is created successfully"
     rt="$arn"
     echo "$arn"
 }
 
 
+function add_event_trigger_to_lambda_function(){
+    # $1 function_name
+    # $2 event_arn
+
+    echo "Adding event trigger $2 to $1 lambda function ..."
+
+    if ! check_exists=$(
+        aws lambda list-event-source-mappings \
+            --region $region \
+            --function-name "$1" \
+            --event-source-arn "$2" \
+            --query "EventSourceMappings[0].UUID" \
+            --output text
+        ); 
+    then
+        echo "Error while creating event trigger"
+        exit 1
+    fi
+
+    check_exists="${check_exists%$'\n'}"
+
+    if [[ "$check_exists" != "None" ]]; then
+        echo "Event trigger is already exists"
+        return 0
+    fi
+
+    if ! output=$(
+            aws lambda create-event-source-mapping \
+                --region $region \
+                --function-name "$1" \
+                --event-source-arn "$2"
+        ); 
+    then
+        echo "Error while adding event trigger"
+        exit 1
+    fi
+
+    echo "Event trigger $2 is added successfully"
+}
+
+
 upload_lambda_code_to_bucket "git@github.com:MohamedAlkady65/pixlize-lambda.git" "main" "$lambda_code_bucket_name"
 lambda_code_s3_key="$rt"
 
+print_sperator
 
-create_role "${app_lambda_role[name]}"
-app_lambda_role[arn]="$rt"
+create_role "${app_lambda_role[name]}" "${app_lambda_assume_role_document}"
+app_lambda_role[id]="$rt1"
+app_lambda_role[arn]="$rt2"
 
-attach_policy_to_role "${app_lambda_role[name]}" "${app_lambda_role[attach_policy_arn]}" 
+print_sperator
 
-create_lambda_function "${app_lambda[name]}" "${app_lambda[runtime]}" "${app_lambda_role[arn]}" "${app_lambda[handler]}" "$lambda_code_bucket_name" "$lambda_code_s3_key"
+attach_policy_to_role "${app_lambda_role[name]}" "${app_lambda_role[attach_policy_arn]}"
+
+print_sperator
+
+put_policy_to_role "${app_lambda_role[name]}" "${app_lambda_role[policy_name]}" "${app_lambda_role[policy_document]}" 
+
+print_sperator
+
+create_lambda_function "${app_lambda[name]}" "${app_lambda[runtime]}" "${app_lambda_role[arn]}" "${app_lambda[handler]}" "$lambda_code_bucket_name" "$lambda_code_s3_key" "Variables={MY_AWS_REGION=$region,S3_BUCKET_NAME=$app_bucket_name,SNS_TOPIC_ARN=${app_topic[arn]}}"
 app_lambda[arn]="$rt"
+
+print_sperator
+
+add_event_trigger_to_lambda_function "${app_lambda[name]}" "${app_queue[arn]}"
+
+print_sperator

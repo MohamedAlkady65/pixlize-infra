@@ -75,3 +75,10 @@ create certificates for domains
 
 declare -p > vars_state.sh
 source vars_state.sh
+
+
+=======================================
+
+cloud formation
+security group rules
+private subnets

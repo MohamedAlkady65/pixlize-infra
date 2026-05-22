@@ -47,7 +47,7 @@ function create_sqs_queue(){
     rt1="$url"
     rt2="$arn"
     
-    echo "$rt"
+    echo "$rt2"
 }
 
 
