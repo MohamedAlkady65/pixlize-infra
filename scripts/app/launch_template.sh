@@ -10,21 +10,6 @@ back_launch_tamplate[name]="$prefix-app-back-launch-template"
 declare -A front_launch_tamplate
 front_launch_tamplate[name]="$prefix-app-front-launch-template"
 
-app_instance_assume_role_document=$(cat <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-EOF
-)
 declare -A app_back_instance_role
 
 app_back_instance_role[name]="$prefix-app-back-instance-role"
@@ -145,76 +130,6 @@ function create_key_pair(){
     echo "Key pair $1 is created successfully"
     echo "$key_id"
     rt="$key_id"
-}
-
-function create_role(){
-    # $1 role_name
-    # $2 assume_role_document
-    # $3 role_policy_name
-    # $4 role_policy_document
-
-    echo "Create $1 role ..."
-    
-    if ! check_exists=$(
-        aws iam list-roles \
-            --region $region \
-            --query "Roles[?RoleName=='$1'] | [0]" \
-            --output json
-        ); 
-    then
-        echo "Error while creating role"
-        exit 1
-    fi
-
-    if [[ "$check_exists" != "null" ]]; then
-        output="$check_exists"
-        echo "Role is already exists"
-    else
-        output=$(
-        aws iam create-role \
-            --region $region \
-            --role-name "$1" \
-            --assume-role-policy-document "$2" \
-            --query "Role" \
-            --tags "Key=Name,Value=$1" "Key=Env,Value=$env" "Key=App,Value=$app" \
-            --output json
-                ); 
-
-        if [ $? -eq 0 ];
-        then
-            echo "Role $1 is created successfully"
-        else
-            echo "Error while creating role"
-            exit 1
-        fi
-    fi
-
-
-    role_id=$(echo -n "$output" | jq -r ".RoleId")
-    role_arn=$(echo -n "$output" | jq -r ".Arn")
-
-
-    if ! output=$(
-        aws iam put-role-policy \
-            --region $region \
-            --role-name "$1" \
-            --policy-name "$3" \
-            --policy-document "$4"
-        ); 
-    then
-        echo "Error while creating role"
-        exit 1
-    fi
-
-    echo "Policy $3 added sucessfully to $1"
-
-
-
-    echo $role_id
-    echo $role_arn
-
-    rt1=$role_id
-    rt2=$role_arn
 }
 
 function create_launch_tamplate_data(){
@@ -392,16 +307,25 @@ key_id=$rt
 
 print_sperator
 
-create_role "${app_back_instance_role[name]}" "$app_instance_assume_role_document" "${app_back_instance_role[policy_name]}" "${app_back_instance_role[policy_document]}"
+
+
+create_role "${app_back_instance_role[name]}" 
 app_back_instance_role[id]="$rt1"
 app_back_instance_role[arn]="$rt2"
 
 print_sperator
 
-create_role "${app_front_instance_role[name]}" "$app_instance_assume_role_document" "${app_front_instance_role[policy_name]}" "${app_front_instance_role[policy_document]}"
+put_policy_to_role "${app_back_instance_role[name]}" "${app_back_instance_role[policy_name]}" "${app_back_instance_role[policy_document]}"
+
+print_sperator
+
+create_role "${app_front_instance_role[name]}"
 app_front_instance_role[id]="$rt1"
 app_front_instance_role[arn]="$rt2"
 
+print_sperator
+
+put_policy_to_role "${app_front_instance_role[name]}" "${app_front_instance_role[policy_name]}" "${app_front_instance_role[policy_document]}"
 
 print_sperator
 

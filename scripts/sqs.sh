@@ -21,13 +21,8 @@ function create_sqs_queue(){
 
     if [[ "$check_exists" != "None" ]]; then
         echo "Queue is already exists"
-        rt="$check_exists"
-        echo "$rt"
-        return 0
-    fi
-
-
-    if ! url=$(aws sqs create-queue \
+        url="$check_exists"
+    elif ! url=$(aws sqs create-queue \
                     --queue-name "$1" \
                     --region $region \
                     --tags "Env=$env,App=$app" \
@@ -38,13 +33,26 @@ function create_sqs_queue(){
         exit 1
     fi
 
+    if ! arn=$(aws sqs get-queue-attributes \
+                    --queue-url "$url" \
+                    --attribute-names QueueArn \
+                    --query "Attributes.QueueArn" \
+                    --output text ); 
+    then
+        echo "Error while creating queue"
+        exit 1
+    fi
+
     echo "Queue $1 is created successfully"
-    rt="$url"
+    rt1="$url"
+    rt2="$arn"
+    
     echo "$rt"
 }
 
 
 create_sqs_queue "${app_queue[name]}"
-app_queue[url]="$rt"
+app_queue[url]="$rt1"
+app_queue[arn]="$rt2"
 print_sperator
  

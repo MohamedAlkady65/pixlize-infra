@@ -1,0 +1,19 @@
+FROM python:3.12
+
+RUN apt update
+RUN apt install -y zip
+
+COPY build.sh ./lambda/
+RUN chmod +x ./lambda/build.sh
+
+WORKDIR /lambda/code
+
+COPY code/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY code/handler.py code/processors.py ./
+
+COPY build.sh /lambda/
+RUN chmod +x /lambda/build.sh
+
+CMD ["bash", "/lambda/build.sh"]

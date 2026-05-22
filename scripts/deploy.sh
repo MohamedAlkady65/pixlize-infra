@@ -12,9 +12,11 @@ source ./config/config.prod.sh
 source ./vpc.sh
 source ./security.sh
 source ./database.sh
+source ./roles.sh
 source ./s3.sh
 source ./sqs.sh
 source ./sns.sh
+source ./lambda.sh
 source ./config_parametars.sh
 source ./app/launch_template.sh
 source ./app/load_balancer.sh
