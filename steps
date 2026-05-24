@@ -82,3 +82,5 @@ source vars_state.sh
 cloud formation
 security group rules
 private subnets
+db host null
+Event trigger is already exists

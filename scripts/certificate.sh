@@ -5,6 +5,9 @@ app_back_certificate[domain]="$app_back_domain"
 declare -A app_front_certificate
 app_front_certificate[domain]="$app_front_domain"
 
+declare -A app_system_certificate
+app_system_certificate[domain]="$app_system_domain"
+
 
 function validate_certificate(){
     # $1 certificate_arn
@@ -90,12 +93,16 @@ EOF
 
 function create_certificate(){
     # $1 domain
+    # $2 certificate_region
 
     echo "Create $1 certificate ..."
+
+    certificate_region="${2:-$region}"
 
 
     if ! check_exists=$(
         aws acm list-certificates \
+            --region "$certificate_region" \
             --query "CertificateSummaryList[?DomainName == '$1'] | [0]" \
             --output "json"
         ); 
@@ -125,7 +132,7 @@ function create_certificate(){
 
     if ! arn=$(
         aws acm request-certificate \
-            --region "$region" \
+            --region "$certificate_region" \
             --domain-name "$1" \
             --validation-method DNS \
             --query "CertificateArn" \
@@ -153,5 +160,10 @@ print_sperator
 
 create_certificate "${app_front_certificate[domain]}"
 app_front_certificate[arn]="$rt"
+
+print_sperator
+
+create_certificate "${app_system_certificate[domain]}"
+app_system_certificate[arn]="$rt"
 
 print_sperator

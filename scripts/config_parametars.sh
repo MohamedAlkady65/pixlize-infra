@@ -28,7 +28,7 @@ AWS_REGION=$region
 S3_BUCKET_NAME=$app_bucket_name
 SQS_QUEUE_URL=${app_queue[url]}
 
-FRONTEND_URL=https://$app_front_domain
+FRONTEND_URL=https://$app_system_domain
 
 EOF
 )

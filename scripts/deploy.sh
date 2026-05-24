@@ -25,3 +25,4 @@ source ./certificate.sh
 source ./app/load_balancer_listener.sh
 source ./app/auto_scaling_group.sh
 source ./app/sns_subscription.sh
+source ./cloud_front.sh

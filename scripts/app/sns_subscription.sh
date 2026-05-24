@@ -66,4 +66,6 @@ function https_topic_subscription(){
 
 
 
-https_topic_subscription "arn:aws:sns:eu-west-3:595923192190:pixlize-prod-app-topic" "https://api.pixlize.alkady.link/webhooks/sns"
+https_topic_subscription "${app_topic[arn]}" "https://$app_back_domain/webhooks/sns"
+
+print_sperator
