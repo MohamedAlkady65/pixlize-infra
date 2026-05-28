@@ -43,7 +43,7 @@ app_lambda_role[policy_document]=$(cat <<EOF
             "Sid": "S2",
             "Effect": "Allow",
             "Action": "s3:*",
-            "Resource": "arn:aws:s3:::${app_bucket_name}/*"
+            "Resource": "arn:aws:s3:::${app_bucket[name]}/*"
         },
         {
             "Sid": "S3",
@@ -253,7 +253,7 @@ put_policy_to_role "${app_lambda_role[name]}" "${app_lambda_role[policy_name]}" 
 
 print_sperator
 
-create_lambda_function "${app_lambda[name]}" "${app_lambda[runtime]}" "${app_lambda_role[arn]}" "${app_lambda[handler]}" "$lambda_code_bucket_name" "$lambda_code_s3_key" "Variables={MY_AWS_REGION=$region,S3_BUCKET_NAME=$app_bucket_name,SNS_TOPIC_ARN=${app_topic[arn]}}"
+create_lambda_function "${app_lambda[name]}" "${app_lambda[runtime]}" "${app_lambda_role[arn]}" "${app_lambda[handler]}" "${lambda_code_bucket[name]}" "$lambda_code_s3_key" "Variables={MY_AWS_REGION=$region,S3_BUCKET_NAME=${app_bucket[name]},SNS_TOPIC_ARN=${app_topic[arn]}}"
 app_lambda[arn]="$rt"
 
 print_sperator

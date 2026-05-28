@@ -121,12 +121,47 @@ function create_db_instance(){
             echo "Error while creating DB instance"
             exit 1
     fi
+
+
+    echo "Fetching endpoint information"
     
+    count=1
+    while true; do
+        echo "Try $count ..."
+
+        if ! db=$(
+            aws rds describe-db-instances \
+                --region $region \
+                --db-instance-identifier "$1" \
+                --output json \
+                --query "DBInstances[0]" 2>&1
+            );
+        then
+            echo "Error while creating DB instance"
+            exit 1
+        fi
+
+        address=$(echo "$db" | jq -r ".Endpoint.Address")
+        port=$(echo "$db" | jq -r ".Endpoint.Port")
+
+        if [[ $address != "null" && $port != "null" ]]; then
+            break
+        fi
+
+        ((count++))
+
+        if [[ $count -gt 10 ]]; then
+            echo "Error while creating DB instance"
+            exit 1
+        fi
+        
+        sleep 60
+    done
 
     rt1="$secret_name"
     rt2="$secret_arn"
-    rt3=$(echo "$db" | jq -r ".Endpoint.Address")
-    rt4=$(echo "$db" | jq -r ".Endpoint.Port")
+    rt3="$address"
+    rt4="$port"
 
 
 }

@@ -43,10 +43,11 @@ sgs=(
   "sg_db"
 )
 
+
+
 function create_security_group(){
     # $1 sg_name
     # $2 vpc_id
-    # $3 in_rules
     # return security_group_id
 
     echo "Create $1 Security Group ..."
@@ -84,8 +85,18 @@ function create_security_group(){
     fi
 
 
+    echo "$sg_id"
+    rt="$sg_id"
+}
 
-    echo "Adding in-bound rules to security group"
+function add_in_rules_to_security_group(){
+    # $1 sg_id
+    # $2 inrules
+
+    sg_id="$1"
+    inrules="$2"
+
+    echo "Adding in-bound rules to security group $sg_id"
 
 
     readarray -t current_rules < <(
@@ -108,7 +119,7 @@ function create_security_group(){
         fi
     fi
 
-    IFS='&&' read -ra rules <<< $3
+    IFS='&&' read -ra rules <<< $inrules
 
     if ! output=$(
         aws ec2 authorize-security-group-ingress \
@@ -119,8 +130,6 @@ function create_security_group(){
         exit 1
     fi
 
-    echo "$sg_id"
-    rt="$sg_id"
 }
 
 
@@ -129,6 +138,14 @@ for sg_name in "${sgs[@]}"; do
 
     create_security_group "${sg[name]}" "$vpc_id" "${sg[inrules]}"
     sg[id]="$rt"
+
+    print_sperator
+done
+
+for sg_name in "${sgs[@]}"; do
+    declare -n sg="$sg_name"
+
+    add_in_rules_to_security_group "${sg[id]}" "${sg[inrules]}"
 
     print_sperator
 done

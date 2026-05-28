@@ -1,3 +1,5 @@
+declare -p > vars_state.sh
+
 declare -A app_distribution;
 app_distribution[domain]="$app_system_domain"
 app_distribution[domain_origin]="$app_front_domain"
@@ -15,13 +17,15 @@ function create_distribution_to_https(){
     
     if ! check_exists=$(
             aws cloudfront list-distributions \
-            --query 'DistributionList.Items[?Aliases.Items[0]=='$1'] | [0].DomainName' \
+            --query "DistributionList.Items[?contains(Aliases.Items, '$1')] | [0].DomainName "\
             --output text
         ); 
     then
         echo "Error while distribution"
         exit 1
     fi
+
+    echo "$check_exists"
 
     check_exists="${check_exists%$'\n'}"
 
@@ -59,20 +63,21 @@ function create_distribution_to_https(){
             ]
         },
         "DefaultCacheBehavior": {
-        "TargetOriginId": "$3",
-        "ViewerProtocolPolicy": "redirect-to-https",
-        "ForwardedValues": {
-            "QueryString": false,
-            "Cookies": { "Forward": "none" }
-        },    
+            "TargetOriginId": "$3",
+            "ViewerProtocolPolicy": "redirect-to-https",
+            "MinTTL": 0,
+            "ForwardedValues": {
+                "QueryString": false,
+                "Cookies": { "Forward": "none" }
+            },    
             "AllowedMethods": {
-            "Quantity": 7,
-            "Items": ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"],
-            "CachedMethods": {
-                "Quantity": 2,
-                "Items": ["GET", "HEAD"]
-            }
-            },
+                    "Quantity": 7,
+                    "Items": ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"],
+                    "CachedMethods": {
+                        "Quantity": 2,
+                        "Items": ["GET", "HEAD"]
+                    }
+                }
         },
         "ViewerCertificate": {
             "ACMCertificateArn": "$4",
@@ -114,7 +119,7 @@ change=$(cat <<EOF
     "Name": "$app_system_domain",
     "Type": "A",
     "AliasTarget": {
-        "HostedZoneId": "${app_front_elb[hosted_zone_id]}",
+        "HostedZoneId": "Z2FDTNDATAQYW2",
         "DNSName": "${app_distribution[domain_dist]}",
         "EvaluateTargetHealth": false
     }

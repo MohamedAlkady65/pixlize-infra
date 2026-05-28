@@ -6,8 +6,7 @@ function https_topic_subscription(){
     echo "Subscribe https to topic $1"
 
     count=1
-    status=''
-
+    
     echo "Check app is running before subscribe ..."
 
     while true; do

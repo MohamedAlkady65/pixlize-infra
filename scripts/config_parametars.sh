@@ -25,7 +25,7 @@ JWT_SECRET=<<JWT_SECRET>>
 AWS_REGION=$region
 
 
-S3_BUCKET_NAME=$app_bucket_name
+S3_BUCKET_NAME=${app_bucket[name]}
 SQS_QUEUE_URL=${app_queue[url]}
 
 FRONTEND_URL=https://$app_system_domain

@@ -11,9 +11,11 @@ app_system_certificate[domain]="$app_system_domain"
 
 function validate_certificate(){
     # $1 certificate_arn
-    # $2 try_number
+    # $2 certificate_region
+    # $3 try_number
 
-    try_number="$2"
+    certificate_region="$2"
+    try_number="$3"
 
     if [ "$try_number" = "" ];
     then
@@ -24,6 +26,7 @@ function validate_certificate(){
 
     record=$(
         aws acm describe-certificate \
+            --region "$certificate_region" \
             --certificate-arn "$1" \
             --query "Certificate.DomainValidationOptions[0]"\
             --output "json"
@@ -47,7 +50,7 @@ function validate_certificate(){
             exit 1
         else    
                 sleep 10
-                validate_certificate "$1" "$try_number"
+                validate_certificate "$1" "$2" "$try_number"
             return 0
         fi
     fi
@@ -80,6 +83,7 @@ EOF
 
     if ! output=$(
         aws acm  wait  certificate-validated \
+            --region "$certificate_region" \
             --certificate-arn "$1"
         ); 
     then
@@ -119,7 +123,7 @@ function create_certificate(){
         status=$(echo -n "$check_exists" | jq -r ".Status")
 
         if [[ "$status" = "PENDING_VALIDATION" ]]; then
-            validate_certificate "$arn"
+            validate_certificate "$arn" "$certificate_region"
         else
             echo "Certificate is already validated"
         fi
@@ -146,7 +150,7 @@ function create_certificate(){
 
     echo "Certificate $1 is created successfully"
 
-    validate_certificate "$arn"
+    validate_certificate "$arn" "$certificate_region"
 
     rt="$arn"
     echo "$arn"
@@ -163,7 +167,7 @@ app_front_certificate[arn]="$rt"
 
 print_sperator
 
-create_certificate "${app_system_certificate[domain]}"
+create_certificate "${app_system_certificate[domain]}" "us-east-1"
 app_system_certificate[arn]="$rt"
 
 print_sperator

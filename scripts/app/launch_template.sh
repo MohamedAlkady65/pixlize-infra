@@ -67,7 +67,7 @@ app_back_instance_role[policy_document]=$(cat <<EOF
             "Sid": "S5",
             "Effect": "Allow",
             "Action": "s3:*",
-            "Resource": "arn:aws:s3:::${app_bucket_name}/*"
+            "Resource": "arn:aws:s3:::${app_bucket[name]}/*"
         },
         {
             "Sid": "S6",
