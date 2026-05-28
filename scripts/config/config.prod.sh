@@ -22,3 +22,5 @@ app_back_domain="api.pixlize.$domain"
 app_front_domain="front.pixlize.$domain"
 
 app_system_domain="system.pixlize.$domain"
+
+app_bucket_domain="bucket.pixlize.$domain"

@@ -30,6 +30,8 @@ SQS_QUEUE_URL=${app_queue[url]}
 
 FRONTEND_URL=https://$app_system_domain
 
+CLOUD_FRONT_BUCKET_URL=https://$app_bucket_domain
+
 EOF
 )
 

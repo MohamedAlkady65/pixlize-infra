@@ -8,6 +8,9 @@ app_front_certificate[domain]="$app_front_domain"
 declare -A app_system_certificate
 app_system_certificate[domain]="$app_system_domain"
 
+declare -A app_bucket_certificate
+app_bucket_certificate[domain]="$app_bucket_domain"
+
 
 function validate_certificate(){
     # $1 certificate_arn
@@ -169,5 +172,10 @@ print_sperator
 
 create_certificate "${app_system_certificate[domain]}" "us-east-1"
 app_system_certificate[arn]="$rt"
+
+print_sperator
+
+create_certificate "${app_bucket_certificate[domain]}" "us-east-1"
+app_bucket_certificate[arn]="$rt"
 
 print_sperator

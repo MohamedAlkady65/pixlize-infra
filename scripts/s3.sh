@@ -34,22 +34,42 @@ function create_bucket(){
     elif ! output=$(aws s3api create-bucket \
                     --bucket "$1" \
                     --region $region \
-                    --create-bucket-configuration "LocationConstraint=$region")
-        ||
+                    --create-bucket-configuration "LocationConstraint=$region") \
+        || \
         ! output=$(aws s3api put-public-access-block \
             --bucket "$1" \
             --bucket-region $region \
             --public-access-block-configuration \
             "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
-        )
-        ; 
+        ); 
     then
         echo "Error while creating bucket"
         exit 1
     fi
 
-    rt="${$1}.s3.${region}.amazonaws.com"
+    rt="$1.s3.$region.amazonaws.com"
     echo "Bucket $1 is created successfully"
+}
+
+
+function put_bucket_policy(){
+    # $1 bucket_name
+    # $2 bucket_policy
+
+    echo "Putting policy for $1 bucket ..."
+
+    if ! output=$(
+            aws s3api put-bucket-policy \
+            --region $region \
+            --bucket "$1" \
+            --policy "$2"
+        ); 
+    then
+        echo "Error while putting policy"
+        exit 1
+    fi
+
+    echo "Put Policy for $1 bucket successfully"
 }
 
 
