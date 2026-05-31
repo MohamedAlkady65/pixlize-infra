@@ -38,7 +38,6 @@ function create_bucket(){
         || \
         ! output=$(aws s3api put-public-access-block \
             --bucket "$1" \
-            --bucket-region $region \
             --public-access-block-configuration \
             "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
         ); 

@@ -14,7 +14,7 @@ ENV=$app_env
 PORT=$app_back_port_in_container
 
 DB_USER=<<DB_USER>>
-DB_PASS="<<DB_PASS>>"
+DB_PASS=<<DB_PASS>>
 
 DB_HOST=${rds_db[host]}
 DB_PORT=${rds_db[port]}

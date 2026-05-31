@@ -234,7 +234,7 @@ function add_event_trigger_to_lambda_function(){
 }
 
 
-upload_lambda_code_to_bucket "git@github.com:MohamedAlkady65/pixlize-lambda.git" "main" "$lambda_code_bucket_name"
+upload_lambda_code_to_bucket "git@github.com:MohamedAlkady65/pixlize-lambda.git" "main" "${lambda_code_bucket[name]}"
 lambda_code_s3_key="$rt"
 
 print_sperator

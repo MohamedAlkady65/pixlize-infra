@@ -17,7 +17,7 @@ sudo apt update
 ##############################
 
 echo "Install required packages"
-sudo apt install -y git jq unzip
+sudo apt install -y git jq unzip ruby-full wget equivs
 
 ##############################
 
@@ -33,28 +33,36 @@ rm -r aws awscliv2.zip
 
 ##############################
 
-echo "Get github private key"
+echo "aws CodeDeploy agent"
 
-aws secretsmanager get-secret-value \
---secret-id github-private-key \
---query SecretString \
---output text  \
-| jq -r '.Key' \
-> /home/ubuntu/.ssh/id_ed25519
-
-sudo chown ubuntu:ubuntu /home/ubuntu/.ssh/id_ed25519 
-
-chmod 600 /home/ubuntu/.ssh/id_ed25519
-
-##############################
+mkdir ./codedeploy
+cd ./codedeploy
 
 
-echo "ssh keyscan github"
+wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
 
-sudo -u ubuntu touch /home/ubuntu/.ssh/known_hosts
+chmod +x ./install
 
-sudo -u ubuntu ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts
+cat > ruby3.2-dummy.control << 'EOF'
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Package: ruby3.2
+Version: 3.2.99
+Description: Dummy ruby3.2 to satisfy codedeploy dependency
+EOF
 
+equivs-build ruby3.2-dummy.control
+sudo dpkg -i ruby3.2_3.2.99_all.deb
+
+ln -s /usr/bin/ruby /usr/bin/ruby3.2
+
+sudo ./install auto
+
+sudo service codedeploy-agent start
+
+cd ..
+rm -r ./codedeploy
 
 ##############################
 
@@ -96,15 +104,10 @@ sudo usermod -aG docker ubuntu
 
 ##############################
 
-echo "Cloning Repo"
-
-sudo -u ubuntu git clone --branch main git@github.com:MohamedAlkady65/pixlize-back.git app
-
-cd ./app
-
-##############################
-
 echo "Building .ENV File"
+
+mkdir ./app
+cd ./app
 
 
 jwt_secret=$(aws secretsmanager get-secret-value \
@@ -143,9 +146,16 @@ echo "$parametar_config" > ".env"
 
 chown ubuntu:ubuntu .env
 
-##############################
+##################################
 
-echo "Start Service"
+echo "Save Variable Needed For Code Deploy"
 
-docker build -t app  .
-docker container run -d --name app -p "$port_in_host:$port_in_container"  app
+cat > ./codedeploy-env <<EOF
+
+port_in_host=$port_in_host
+port_in_container=$port_in_container
+image_name=app-image
+container_name=app-container
+EOF
+
+chmod 644 ./codedeploy-env

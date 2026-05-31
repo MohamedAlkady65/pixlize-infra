@@ -110,6 +110,8 @@ function create_db_instance(){
 
     echo "Fetching DB secret name"
 
+    sleep 10
+
     secret_arn=$(echo "$db" | jq -r ".MasterUserSecret.SecretArn")
 
     secret_name=$(aws secretsmanager list-secrets \
