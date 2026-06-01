@@ -24,7 +24,7 @@ function create_distribution(){
 
     check_exists="${check_exists%$'\n'}"
 
-    if [[ "$check_exists" != "None" ]]; then
+    if [[ "$check_exists" != "null" ]]; then
         domain_dist=$(echo "$check_exists" | jq -r ".DomainName")
         arn=$(echo "$check_exists" | jq -r ".ARN")
         echo "Distribution is already exists"
