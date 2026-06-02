@@ -158,4 +158,11 @@ image_name=app-image
 container_name=app-container
 EOF
 
-chmod 644 ./codedeploy-env
+chown ubuntu:ubuntu ./codedeploy-env
+
+
+#################################
+
+touch "/home/ubuntu/user_data_script_done"
+chown ubuntu:ubuntu "/home/ubuntu/user_data_script_done"
+

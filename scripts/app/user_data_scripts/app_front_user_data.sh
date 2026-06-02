@@ -120,3 +120,8 @@ echo "Start Service"
 
 docker build -t app  .
 docker container run -d --name app -p "$port_in_host:80" --env-file .env app
+
+#################################
+
+touch "/home/ubuntu/user_data_script_done"
+chown ubuntu:ubuntu "/home/ubuntu/user_data_script_done"
