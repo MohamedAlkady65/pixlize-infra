@@ -74,7 +74,13 @@ app_back_instance_role[policy_document]=$(cat <<EOF
             "Effect": "Allow",
             "Action": "sqs:*",
             "Resource": "${app_queue[arn]}"
-        }
+        },
+		{
+			"Sid": "S7",
+			"Effect": "Allow",
+			"Action": "s3:*",
+			"Resource": "arn:aws:s3:::${pipeline_bucket[name]}/*"
+		}
     ]
 }
 EOF
@@ -409,3 +415,4 @@ front_launch_tamplate[data]="$rt"
 create_launch_tamplate "${front_launch_tamplate[name]}" "${front_launch_tamplate[data]}"
 front_launch_tamplate[id]="$rt"
 
+print_sperator

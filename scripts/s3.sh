@@ -1,11 +1,11 @@
-account_id=$(aws sts get-caller-identity --query Account --output text)
-account_id="${account_id%$'\n'}"
-
 declare -A app_bucket
 app_bucket[name]="$prefix-app-bucket-$account_id"
 
 declare -A lambda_code_bucket
 lambda_code_bucket[name]="$prefix-lambda-code-bucket-$account_id"
+
+declare -A pipeline_bucket
+pipeline_bucket[name]="$prefix-pipeline-bucket-$account_id"
 
 
 
@@ -78,5 +78,9 @@ print_sperator
 
 create_bucket "${lambda_code_bucket[name]}"
 lambda_code_bucket[domain]="$rt"
+print_sperator
+ 
+create_bucket "${pipeline_bucket[name]}"
+pipeline_bucket[domain]="$rt"
 print_sperator
  

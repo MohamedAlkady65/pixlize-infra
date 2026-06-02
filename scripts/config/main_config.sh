@@ -4,6 +4,9 @@ function print_sperator(){
     echo "-----------------------------------------------------------------------"
 }
 
+account_id=$(aws sts get-caller-identity --query Account --output text)
+account_id="${account_id%$'\n'}"
+
 keys_dir="/home/alkady/Desktop/key_pairs"
 github_private_key_secret_arn="arn:aws:secretsmanager:eu-west-3:595923192190:secret:github-private-key-PyzdaS"
 
