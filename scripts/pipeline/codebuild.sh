@@ -104,7 +104,7 @@ codebuild_app_back_role[policy_document]=$(cat <<EOF
         },
         {
             "Effect": "Allow",
-            "Resource": "arn:aws:s3:::${pipeline_bucket[name]}/*",
+            "Resource": "arn:aws:s3:::${app_back_pipeline_bucket[name]}/*",
             "Action": [
                 "s3:PutObject",
                 "s3:GetObject",
@@ -179,7 +179,7 @@ codebuild_app_front_role[policy_document]=$(cat <<EOF
         },
         {
             "Effect": "Allow",
-            "Resource": "arn:aws:s3:::${pipeline_bucket[name]}/*",
+            "Resource": "arn:aws:s3:::${app_front_pipeline_bucket[name]}/*",
             "Action": [
                 "s3:PutObject",
                 "s3:GetObject",
@@ -253,7 +253,7 @@ codebuild_app_lambda_role[policy_document]=$(cat <<EOF
         },
         {
             "Effect": "Allow",
-            "Resource": "arn:aws:s3:::${pipeline_bucket[name]}/*",
+            "Resource": "arn:aws:s3:::${app_lambda_pipeline_bucket[name]}/*",
             "Action": [
                 "s3:PutObject",
                 "s3:GetObject",

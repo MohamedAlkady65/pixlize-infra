@@ -1,11 +1,14 @@
 declare -A app_bucket
 app_bucket[name]="$prefix-app-bucket-$account_id"
 
-declare -A lambda_code_bucket
-lambda_code_bucket[name]="$prefix-lambda-code-bucket-$account_id"
+declare -A app_back_pipeline_bucket
+app_back_pipeline_bucket[name]="$prefix-app-back-pipeline-bucket-$account_id"
 
-declare -A pipeline_bucket
-pipeline_bucket[name]="$prefix-pipeline-bucket-$account_id"
+declare -A app_front_pipeline_bucket
+app_front_pipeline_bucket[name]="$prefix-app-front-pipeline-bucket-$account_id"
+
+declare -A app_lambda_pipeline_bucket
+app_lambda_pipeline_bucket[name]="$prefix-app-lambda-pipeline-bucket-$account_id"
 
 
 
@@ -76,11 +79,15 @@ create_bucket "${app_bucket[name]}"
 app_bucket[domain]="$rt"
 print_sperator
 
-create_bucket "${lambda_code_bucket[name]}"
-lambda_code_bucket[domain]="$rt"
+create_bucket "${app_back_pipeline_bucket[name]}"
+app_back_pipeline_bucket[domain]="$rt"
 print_sperator
- 
-create_bucket "${pipeline_bucket[name]}"
-pipeline_bucket[domain]="$rt"
+
+create_bucket "${app_front_pipeline_bucket[name]}"
+app_front_pipeline_bucket[domain]="$rt"
+print_sperator
+
+create_bucket "${app_lambda_pipeline_bucket[name]}"
+app_lambda_pipeline_bucket[domain]="$rt"
 print_sperator
  

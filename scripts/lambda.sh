@@ -89,6 +89,7 @@ function create_lambda_function(){
     fi
 
 
+    echo "Creating function ..."
     if ! arn=$(aws lambda create-function \
         --region $region \
         --function-name "$1" \
@@ -102,6 +103,7 @@ function create_lambda_function(){
         exit 1
     fi
 
+    echo "Waiting function activate ..."
     if ! output=$(aws lambda wait function-active \
                 --region $region \
                 --function-name "$1"
@@ -111,6 +113,7 @@ function create_lambda_function(){
         exit 1
     fi
 
+    echo "Creating alias ..."
     if ! output=$(aws lambda create-alias \
                 --region $region \
                 --function-name "$1" \
@@ -121,6 +124,7 @@ function create_lambda_function(){
         exit 1
     fi
 
+    echo "Updating environment variables  ..."
     if ! output=$(aws lambda update-function-configuration \
                 --region $region \
                 --function-name "$1" \

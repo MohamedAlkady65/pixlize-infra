@@ -169,8 +169,8 @@ codepipeline_app_back_role[policy_document]=$(cat <<EOF
         "s3:GetObjectVersion"
       ],
       "Resource": [
-        "arn:aws:s3:::${pipeline_bucket[name]}/*",
-        "arn:aws:s3:::${pipeline_bucket[name]}/*"
+        "arn:aws:s3:::${app_back_pipeline_bucket[name]}/*",
+        "arn:aws:s3:::${app_back_pipeline_bucket[name]}/*"
       ]
     },
     {
@@ -245,7 +245,7 @@ print_sperator
 create_codepipeline_project \
     "${codepipeline_app_back[name]}" \
     "${codepipeline_app_back_role[arn]}" \
-    "${pipeline_bucket[name]}" \
+    "${app_back_pipeline_bucket[name]}" \
     "${github_connection_app[arn]}" \
     "${app_back_repo}" \
     "${app_back_branch}" \
@@ -283,8 +283,8 @@ codepipeline_app_front_role[policy_document]=$(cat <<EOF
         "s3:GetObjectVersion"
       ],
       "Resource": [
-        "arn:aws:s3:::${pipeline_bucket[name]}/*",
-        "arn:aws:s3:::${pipeline_bucket[name]}/*"
+        "arn:aws:s3:::${app_front_pipeline_bucket[name]}/*",
+        "arn:aws:s3:::${app_front_pipeline_bucket[name]}/*"
       ]
     },
     {
@@ -359,12 +359,126 @@ print_sperator
 create_codepipeline_project \
     "${codepipeline_app_front[name]}" \
     "${codepipeline_app_front_role[arn]}" \
-    "${pipeline_bucket[name]}" \
+    "${app_front_pipeline_bucket[name]}" \
     "${github_connection_app[arn]}" \
     "${app_front_repo}" \
     "${app_front_branch}" \
     "${codebuild_app_front[name]}" \
     "${codedeploy_app_front[app_name]}" \
     "${codedeploy_app_front[deployment_group_name]}"
+
+print_sperator
+
+# Lambda
+
+
+declare -A codepipeline_app_lambda
+codepipeline_app_lambda[name]="$prefix-app-lambda-codepipeline"
+
+declare -A codepipeline_app_lambda_role
+codepipeline_app_lambda_role[name]="${codepipeline_app_lambda[name]}-role"
+
+codepipeline_app_lambda_role[policy_name]="${codepipeline_app_lambda_role[name]}-policy"
+
+codepipeline_app_lambda_role[policy_document]=$(cat <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketVersioning",
+        "s3:GetBucketAcl",
+        "s3:GetBucketLocation",
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${app_lambda_pipeline_bucket[name]}/*",
+        "arn:aws:s3:::${app_lambda_pipeline_bucket[name]}/*"
+      ]
+    },
+    {
+      "Sid": "Connections",
+      "Effect": "Allow",
+      "Action": [
+        "codeconnections:UseConnection"
+      ],
+      "Resource": "${github_connection_app[arn]}"
+    },
+    {
+      "Sid": "CodeBuild",
+      "Effect": "Allow",
+      "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:BatchGetBuildBatches",
+        "codebuild:StartBuildBatch"
+      ],
+      "Resource": "${codebuild_app_lambda[arn]}"
+    },
+    {
+      "Sid": "CodeDeploy",
+      "Effect": "Allow",
+      "Action": [
+        "codedeploy:CreateDeployment",
+        "codedeploy:GetApplication",
+        "codedeploy:GetApplicationRevision",
+        "codedeploy:RegisterApplicationRevision",
+        "codedeploy:GetDeployment",
+        "codedeploy:GetDeploymentConfig",
+        "codedeploy:GetDeploymentGroup",
+        "codedeploy:ListDeployments",
+        "codedeploy:ListDeploymentGroups",
+        "codedeploy:ListDeploymentConfigs"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+)
+
+codepipeline_app_lambda_role[assume_documnet]=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "codepipeline.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+)
+
+
+
+create_role "${codepipeline_app_lambda_role[name]}" "${codepipeline_app_lambda_role[assume_documnet]}"
+codepipeline_app_lambda_role[id]="$rt1"
+codepipeline_app_lambda_role[arn]="$rt2"
+
+print_sperator
+
+put_policy_to_role "${codepipeline_app_lambda_role[name]}" "${codepipeline_app_lambda_role[policy_name]}" "${codepipeline_app_lambda_role[policy_document]}" 
+
+print_sperator
+
+create_codepipeline_project \
+    "${codepipeline_app_lambda[name]}" \
+    "${codepipeline_app_lambda_role[arn]}" \
+    "${app_lambda_pipeline_bucket[name]}" \
+    "${github_connection_app[arn]}" \
+    "${app_lambda_repo}" \
+    "${app_lambda_branch}" \
+    "${codebuild_app_lambda[name]}" \
+    "${codedeploy_app_lambda[app_name]}" \
+    "${codedeploy_app_lambda[deployment_group_name]}"
 
 print_sperator

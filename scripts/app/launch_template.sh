@@ -79,7 +79,7 @@ app_back_instance_role[policy_document]=$(cat <<EOF
 			"Sid": "S7",
 			"Effect": "Allow",
 			"Action": "s3:*",
-			"Resource": "arn:aws:s3:::${pipeline_bucket[name]}/*"
+			"Resource": "arn:aws:s3:::${app_back_pipeline_bucket[name]}/*"
 		}
     ]
 }
@@ -110,7 +110,13 @@ app_front_instance_role[policy_document]=$(cat <<EOF
             "Effect": "Allow",
             "Action": "ssm:GetParameter",
             "Resource": "$app_front_config_arn"
-        }
+        },
+		{
+			"Sid": "S3",
+			"Effect": "Allow",
+			"Action": "s3:*",
+			"Resource": "arn:aws:s3:::${app_front_pipeline_bucket[name]}/*"
+		}
     ]
 }
 EOF
