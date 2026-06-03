@@ -15,3 +15,6 @@ app_back_branch="main"
 
 app_front_repo="MohamedAlkady65/pixlize-front"
 app_front_branch="main"
+
+app_lambda_repo="MohamedAlkady65/pixlize-lambda"
+app_lambda_branch="main"

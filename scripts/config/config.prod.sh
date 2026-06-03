@@ -13,6 +13,7 @@ app_env="production"
 
 app_back_port_in_container="3000"
 app_back_port_in_host="80"
+app_front_port_in_container="80"
 app_front_port_in_host="80"
 
 domain="alkady.link"

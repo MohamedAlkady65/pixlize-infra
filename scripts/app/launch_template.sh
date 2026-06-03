@@ -399,8 +399,8 @@ print_sperator
 
 front_launch_tamplate[user_data]=$(cat "./app/user_data_scripts/app_front_user_data.sh")
 
-keys_to_replace=("<<parametar_config_name>>" "<<port_in_host>>")
-values_to_replace=("$app_front_config_name" "$app_front_port_in_host")
+keys_to_replace=("<<parametar_config_name>>" "<<port_in_container>>" "<<port_in_host>>")
+values_to_replace=("$app_front_config_name" "$app_front_port_in_container" "$app_front_port_in_host")
 
 
 for i in "${!keys_to_replace[@]}"; do
