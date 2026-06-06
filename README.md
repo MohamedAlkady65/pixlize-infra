@@ -639,7 +639,7 @@ The infrastructure decisions in this project are made to maximize **learning exp
 
 ## Skills Demonstrated
 
-- **Bash scripting** — 2000+ lines of idempotent infrastructure automation; functions, associative arrays (`declare -A`), dynamic name references (`declare -n`), error handling with `exit 1`, heredocs for inline JSON, global return values via `$rt`
+- **Bash scripting** — writing idempotent infrastructure automation scripts to provision and manage AWS resources
 - **AWS CLI** — direct, hands-on experience with 20+ AWS services via CLI (not abstracted by Terraform or CDK); understanding of API parameters, resource dependencies, and ordering
 - **Docker & containerization** — multi-stage builds, container lifecycle management via CodeDeploy hooks, Docker as a build environment for Lambda packaging
 - **Networking** — VPC design, subnet tiering (public/private/isolated), NAT gateway routing, Internet Gateway, route tables, security group chaining
