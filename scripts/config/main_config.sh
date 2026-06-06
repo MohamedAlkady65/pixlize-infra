@@ -18,3 +18,5 @@ app_front_branch="main"
 
 app_lambda_repo="MohamedAlkady65/pixlize-lambda"
 app_lambda_branch="main"
+
+db_port=3306

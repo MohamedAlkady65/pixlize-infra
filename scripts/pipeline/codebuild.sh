@@ -65,7 +65,7 @@ EOF
          --output text
     ); 
     then
-       - echo "Error while creating code build project"
+        echo "Error while creating code build project"
         exit 1
     fi
 
@@ -93,8 +93,8 @@ codebuild_app_back_role[policy_document]=$(cat <<EOF
         {
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_back_role[name]}",
-                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_back_role[name]}:*"
+                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_back[name]}",
+                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_back[name]}:*"
             ],
             "Action": [
                 "logs:CreateLogGroup",
@@ -168,8 +168,8 @@ codebuild_app_front_role[policy_document]=$(cat <<EOF
         {
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_front_role[name]}",
-                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_front_role[name]}:*"
+                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_front[name]}",
+                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_front[name]}:*"
             ],
             "Action": [
                 "logs:CreateLogGroup",
@@ -242,8 +242,8 @@ codebuild_app_lambda_role[policy_document]=$(cat <<EOF
         {
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_lambda_role[name]}",
-                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_lambda_role[name]}:*"
+                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_lambda[name]}",
+                "arn:aws:logs:$region:$account_id:log-group:/aws/codebuild/${codebuild_app_lambda[name]}:*"
             ],
             "Action": [
                 "logs:CreateLogGroup",

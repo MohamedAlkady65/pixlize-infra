@@ -94,6 +94,7 @@ function create_db_instance(){
                 --vpc-security-group-ids "$8" \
                 --db-name "$9" \
                 --no-publicly-accessible \
+                --port "$db_port" \
                 --query "DBInstance"\
                 --output json
             )

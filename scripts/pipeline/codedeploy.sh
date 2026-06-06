@@ -91,11 +91,15 @@ function create_deployment_group(){
             --output text
     )
 
-    [[ "$5" != "ASG" ]] && cmd+=(
+    [[ "$5" == "ASG" ]] && cmd+=(
         --auto-scaling-groups "$6"
         --termination-hook-enabled
-        --load-balancer-info targetGroupInfoList=[{name="$6"}]
+        --load-balancer-info "targetGroupInfoList=[{name=$6}]"
         --deployment-style deploymentType=IN_PLACE,deploymentOption=WITH_TRAFFIC_CONTROL
+    )
+
+    [[ "$5" == "Lambda" ]] && cmd+=(
+        --deployment-style deploymentType=BLUE_GREEN,deploymentOption=WITH_TRAFFIC_CONTROL
     )
 
 

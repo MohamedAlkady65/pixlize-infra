@@ -88,6 +88,9 @@ function create_lambda_function(){
         return 0
     fi
 
+    mkdir -p ./tmp
+    echo '' > ./tmp/dummy
+    zip ./tmp/dummy.zip ./tmp/dummy
 
     echo "Creating function ..."
     if ! arn=$(aws lambda create-function \
@@ -96,12 +99,15 @@ function create_lambda_function(){
         --runtime "$2" \
         --role "$3" \
         --handler "$4" \
+        --zip-file fileb://tmp/dummy.zip \
         --query "FunctionArn" \
         --output text); 
     then
         echo "Error while creating lambda function"
         exit 1
     fi
+
+    rm -r ./tmp
 
     echo "Waiting function activate ..."
     if ! output=$(aws lambda wait function-active \
@@ -118,7 +124,7 @@ function create_lambda_function(){
                 --region $region \
                 --function-name "$1" \
                 --name "$5" \
-                --function-version 1); 
+                --function-version "\$LATEST"); 
     then
         echo "Error while creating lambda function"
         exit 1
@@ -180,8 +186,6 @@ function add_event_trigger_to_lambda_function(){
     echo "Event trigger $2 is added successfully"
 }
 
-
-print_sperator
 
 create_role "${app_lambda_role[name]}" "${app_lambda_assume_role_document}"
 app_lambda_role[id]="$rt1"
