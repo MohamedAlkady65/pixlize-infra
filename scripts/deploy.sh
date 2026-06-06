@@ -6,6 +6,8 @@ function print_sperator(){
 
 env_arg="$1"
 
+source ./config/domain_config.sh
+
 case "$env_arg" in
   prod)
     source ./config/config.prod.sh

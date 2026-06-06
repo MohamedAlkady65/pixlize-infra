@@ -21,7 +21,7 @@ function https_topic_subscription(){
 
         ((count++))
 
-        if [[ $count -gt 10 ]]; then
+        if [[ $count -gt 15 ]]; then
             echo "Failed. App is not running"
             exit 1
         fi

@@ -3,7 +3,12 @@
 
 env=prod
 app_env="production"
-domain="alkady.link"
+domain="$main_domain"
+
+app_back_branch="main"
+app_front_branch="main"
+app_lambda_branch="main"
+
 
 echo "Running in PRODUCTION environment"
 

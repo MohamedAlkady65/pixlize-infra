@@ -24,16 +24,13 @@ app_system_domain="pixlize.$domain"
 
 app_bucket_domain="bucket.pixlize.$domain"
 
-keys_dir="/home/alkady/Desktop/key_pairs"
+keys_dir="~/${app}_key_pairs"
 
 app_back_repo="MohamedAlkady65/pixlize-back"
-app_back_branch="main"
 
 app_front_repo="MohamedAlkady65/pixlize-front"
-app_front_branch="main"
 
 app_lambda_repo="MohamedAlkady65/pixlize-lambda"
-app_lambda_branch="main"
 
 
 account_id=$(aws sts get-caller-identity --query Account --output text)

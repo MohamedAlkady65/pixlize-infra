@@ -110,7 +110,7 @@ EOF
 }
 
 
-create_hosted_zone "$domain"
+create_hosted_zone "$main_domain"
 hosted_zone_id="$rt"
 
 print_sperator

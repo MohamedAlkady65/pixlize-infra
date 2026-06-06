@@ -153,6 +153,8 @@ function create_key_pair(){
         exit 1
     fi
 
+    mkdir -p "$keys_dir"
+
     key_id=$(echo -n "$output" | jq -r ".KeyPairId")
     echo -n "$output" | jq -r ".KeyMaterial" > "$keys_dir/${1}.pem"
 

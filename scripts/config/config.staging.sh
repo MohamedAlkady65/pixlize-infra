@@ -3,7 +3,11 @@
 
 env=staging
 app_env="staging"
-domain="staging.alkady.link"
+domain="staging.$main_domain"
+
+app_back_branch="main"
+app_front_branch="main"
+app_lambda_branch="main"
 
 echo "Running in DEVELOPMENT environment"
 
