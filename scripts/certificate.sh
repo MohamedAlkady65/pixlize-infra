@@ -47,12 +47,12 @@ function validate_certificate(){
     then
         try_number="$((try_number+1))"
 
-        if [ $try_number -eq 5 ];
+        if [ $try_number -eq 10 ];
         then
             echo "Error while validating certificate"
             exit 1
         else    
-                sleep 10
+                sleep 20
                 validate_certificate "$1" "$2" "$try_number"
             return 0
         fi
@@ -153,6 +153,8 @@ function create_certificate(){
 
     echo "Certificate $1 is created successfully"
 
+    sleep 20
+    
     validate_certificate "$arn" "$certificate_region"
 
     rt="$arn"

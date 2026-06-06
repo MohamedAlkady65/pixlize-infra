@@ -1,14 +1,30 @@
 #!/bin/bash
 
-function print_sperator(){
-    echo "-----------------------------------------------------------------------"
-}
+app=pixlize
 
-account_id=$(aws sts get-caller-identity --query Account --output text)
-account_id="${account_id%$'\n'}"
+region=eu-west-3
+az1=eu-west-3a
+az2=eu-west-3b
+
+prefix="$app-$env"
+
+
+app_back_port_in_container="3000"
+app_back_port_in_host="80"
+app_front_port_in_container="80"
+app_front_port_in_host="80"
+
+db_port=3306
+
+app_back_domain="api.pixlize.$domain"
+
+app_front_domain="front.pixlize.$domain"
+
+app_system_domain="pixlize.$domain"
+
+app_bucket_domain="bucket.pixlize.$domain"
 
 keys_dir="/home/alkady/Desktop/key_pairs"
-github_private_key_secret_arn="arn:aws:secretsmanager:eu-west-3:595923192190:secret:github-private-key-PyzdaS"
 
 app_back_repo="MohamedAlkady65/pixlize-back"
 app_back_branch="main"
@@ -19,4 +35,6 @@ app_front_branch="main"
 app_lambda_repo="MohamedAlkady65/pixlize-lambda"
 app_lambda_branch="main"
 
-db_port=3306
+
+account_id=$(aws sts get-caller-identity --query Account --output text)
+account_id="${account_id%$'\n'}"

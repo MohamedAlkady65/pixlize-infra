@@ -41,7 +41,7 @@ function https_topic_subscription(){
 
     echo "Subscription request sent successfully"
 
-    sleep 10
+    sleep 20
 
     if ! check_exists=$(aws sns list-subscriptions-by-topic \
             --topic-arn "$1" \

@@ -111,7 +111,7 @@ function create_db_instance(){
 
     echo "Fetching DB secret name"
 
-    sleep 10
+    sleep 20
 
     secret_arn=$(echo "$db" | jq -r ".MasterUserSecret.SecretArn")
 

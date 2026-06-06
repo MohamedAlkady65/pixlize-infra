@@ -40,12 +40,6 @@ app_back_instance_role[policy_document]=$(cat <<EOF
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "S1",
-            "Effect": "Allow",
-            "Action": "secretsmanager:GetSecretValue",
-            "Resource": "$github_private_key_secret_arn"
-        },
-        {
             "Sid": "S2",
             "Effect": "Allow",
             "Action": "secretsmanager:GetSecretValue",
@@ -99,12 +93,6 @@ app_front_instance_role[policy_document]=$(cat <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
-        {
-            "Sid": "S1",
-            "Effect": "Allow",
-            "Action": "secretsmanager:GetSecretValue",
-            "Resource": "$github_private_key_secret_arn"
-        },
         {
             "Sid": "S2",
             "Effect": "Allow",

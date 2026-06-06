@@ -1,7 +1,26 @@
 #!/bin/bash
 
+function print_sperator(){
+    echo "-----------------------------------------------------------------------"
+}
+
+env_arg="$1"
+
+case "$env_arg" in
+  prod)
+    source ./config/config.prod.sh
+    ;;
+  dev)
+    source ./config/config.dev.sh
+    ;;
+  *)
+    echo "Error: invalid environment '$env_arg'" >&2
+    echo "Usage: $0 {prod|dev}" >&2
+    exit 1
+    ;;
+esac
+
 source ./config/main_config.sh
-source ./config/config.prod.sh
 
 source ./vpc.sh
 source ./security.sh

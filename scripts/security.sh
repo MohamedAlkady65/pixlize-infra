@@ -159,3 +159,5 @@ print_sperator
 
 add_in_rules_to_security_group "${sg_db[id]}" "IpProtocol=tcp,FromPort=$db_port,ToPort=$db_port,UserIdGroupPairs=[{GroupId=${sg_app_back_end[id]}}]"
 
+print_sperator
+

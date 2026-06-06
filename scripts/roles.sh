@@ -77,7 +77,7 @@ function create_role(){
         if [ $? -eq 0 ];
         then
             echo "Role $1 is created successfully"
-            sleep 10
+            sleep 20
         else
             echo "Error while creating role"
             exit 1
