@@ -96,7 +96,7 @@ function add_in_rules_to_security_group(){
     sg_id="$1"
     inrules="$2"
 
-    echo "Adding in-bound rules to security group $sg_id"
+    echo "Adding in-bound rules ($inrules) to security group $sg_id"
 
 
     readarray -t current_rules < <(
@@ -142,10 +142,20 @@ for sg_name in "${sgs[@]}"; do
     print_sperator
 done
 
-for sg_name in "${sgs[@]}"; do
-    declare -n sg="$sg_name"
+add_in_rules_to_security_group "${sg_app_back_end[id]}" "IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges=[{CidrIp=0.0.0.0/0}]"
 
-    add_in_rules_to_security_group "${sg[id]}" "${sg[inrules]}"
+print_sperator
 
-    print_sperator
-done
+add_in_rules_to_security_group "${sg_load_balancer_back_end[id]}" "IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges=[{CidrIp=0.0.0.0/0}]"
+
+print_sperator
+add_in_rules_to_security_group "${sg_app_front_end[id]}" "IpProtocol=tcp,FromPort=80,ToPort=80,PrefixListIds=[{PrefixListId=pl-75b1541c}]"
+
+print_sperator
+
+add_in_rules_to_security_group "${sg_load_balancer_front_end[id]}" "IpProtocol=tcp,FromPort=443,ToPort=443,PrefixListIds=[{PrefixListId=pl-75b1541c}]"
+
+print_sperator
+
+add_in_rules_to_security_group "${sg_db[id]}" "IpProtocol=tcp,FromPort=$db_port,ToPort=$db_port,UserIdGroupPairs=[{GroupId=${sg_app_back_end[id]}}]"
+

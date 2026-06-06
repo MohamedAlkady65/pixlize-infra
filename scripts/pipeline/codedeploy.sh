@@ -94,8 +94,7 @@ function create_deployment_group(){
     [[ "$5" == "ASG" ]] && cmd+=(
         --auto-scaling-groups "$6"
         --termination-hook-enabled
-        --load-balancer-info "targetGroupInfoList=[{name=$6}]"
-        --deployment-style deploymentType=IN_PLACE,deploymentOption=WITH_TRAFFIC_CONTROL
+        --deployment-style deploymentType=IN_PLACE,deploymentOption=WITHOUT_TRAFFIC_CONTROL
     )
 
     [[ "$5" == "Lambda" ]] && cmd+=(
@@ -227,7 +226,7 @@ codedeploy_app_lambda[deployment_group_name]="$prefix-app-lambda-codedeploy-depl
 declare -A codedeploy_app_lambda_deployment_group_role
 codedeploy_app_lambda_deployment_group_role[name]="${codedeploy_app_lambda[deployment_group_name]}-role"
 
-codedeploy_app_lambda_deployment_group_role[attach_policy_arn]="arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
+codedeploy_app_lambda_deployment_group_role[attach_policy_arn]="arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
 
 codedeploy_app_lambda_deployment_group_role[assume_documnet]=$(cat <<EOF
 {
@@ -245,6 +244,26 @@ codedeploy_app_lambda_deployment_group_role[assume_documnet]=$(cat <<EOF
 EOF
 )
 
+codedeploy_app_lambda_deployment_group_role[policy_name]="${codedeploy_app_lambda_deployment_group_role[name]}-policy"
+
+
+codedeploy_app_lambda_deployment_group_role[policy_document]=$(cat <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:GetObject",
+                "s3:GetObjectVersion"
+            ],
+            "Resource": "arn:aws:s3:::*/*",
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+)
+
 
 create_role "${codedeploy_app_lambda_deployment_group_role[name]}" "${codedeploy_app_lambda_deployment_group_role[assume_documnet]}"
 codedeploy_app_lambda_deployment_group_role[id]="$rt1"
@@ -253,6 +272,10 @@ codedeploy_app_lambda_deployment_group_role[arn]="$rt2"
 print_sperator
 
 attach_policy_to_role "${codedeploy_app_lambda_deployment_group_role[name]}" "${codedeploy_app_lambda_deployment_group_role[attach_policy_arn]}"
+
+print_sperator
+
+put_policy_to_role "${codedeploy_app_lambda_deployment_group_role[name]}" "${codedeploy_app_lambda_deployment_group_role[policy_name]}" "${codedeploy_app_lambda_deployment_group_role[policy_document]}" 
 
 print_sperator
 

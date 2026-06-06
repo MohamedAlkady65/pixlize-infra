@@ -261,6 +261,17 @@ codebuild_app_lambda_role[policy_document]=$(cat <<EOF
                 "s3:GetBucketAcl",
                 "s3:GetBucketLocation"
             ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": "${app_lambda[arn]}",
+            "Action": [
+                "lambda:GetFunction",
+                "lambda:GetFunctionConfiguration",
+                "lambda:PublishVersion",
+                "lambda:GetAlias",
+                "lambda:UpdateFunctionCode"
+            ]
         }
     ]
 }
@@ -300,7 +311,7 @@ env_vars=$(cat << EOF
 EOF
 )
 
-create_codebuild_project "${codebuild_app_lambda[name]}" "${codebuild_app_lambda_role[arn]}"
+create_codebuild_project "${codebuild_app_lambda[name]}" "${codebuild_app_lambda_role[arn]}" "$env_vars"
 codebuild_app_lambda[arn]="$rt"
 
 print_sperator

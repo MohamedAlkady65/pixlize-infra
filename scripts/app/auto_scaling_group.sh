@@ -55,7 +55,7 @@ function create_auto_scaling_group(){
             --max-size "$4" \
             --vpc-zone-identifier "$5" \
             --target-group-arns "$6" \
-            --health-check-type ELB \
+            --health-check-type EC2 \
             --health-check-grace-period 600 \
             --tags "Key=Name,Value=$1" "Key=Env,Value=$env" "Key=App,Value=$app"
         ); 

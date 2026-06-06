@@ -177,7 +177,11 @@ codepipeline_app_back_role[policy_document]=$(cat <<EOF
       "Sid": "Connections",
       "Effect": "Allow",
       "Action": [
-        "codeconnections:UseConnection"
+        "codeconnections:UseConnection",
+        "codeconnections:GetConnection",
+        "codeconnections:ListConnections",
+        "codestar-connections:UseConnection",
+        "codestar-connections:GetConnection"      
       ],
       "Resource": "${github_connection_app[arn]}"
     },
@@ -291,7 +295,11 @@ codepipeline_app_front_role[policy_document]=$(cat <<EOF
       "Sid": "Connections",
       "Effect": "Allow",
       "Action": [
-        "codeconnections:UseConnection"
+        "codeconnections:UseConnection",
+        "codeconnections:GetConnection",
+        "codeconnections:ListConnections",
+        "codestar-connections:UseConnection",
+        "codestar-connections:GetConnection"  
       ],
       "Resource": "${github_connection_app[arn]}"
     },
@@ -405,7 +413,11 @@ codepipeline_app_lambda_role[policy_document]=$(cat <<EOF
       "Sid": "Connections",
       "Effect": "Allow",
       "Action": [
-        "codeconnections:UseConnection"
+        "codeconnections:UseConnection",
+        "codeconnections:GetConnection",
+        "codeconnections:ListConnections",
+        "codestar-connections:UseConnection",
+        "codestar-connections:GetConnection"  
       ],
       "Resource": "${github_connection_app[arn]}"
     },

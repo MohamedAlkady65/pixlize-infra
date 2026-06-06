@@ -119,12 +119,23 @@ function create_lambda_function(){
         exit 1
     fi
 
+    echo "Creating version ..."
+    if ! version=$(aws lambda publish-version\
+            --region $region \
+            --function-name "$1" \
+            --query Version \
+            --output text); 
+    then
+        echo "Error while creating lambda function"
+        exit 1
+    fi
+
     echo "Creating alias ..."
     if ! output=$(aws lambda create-alias \
                 --region $region \
                 --function-name "$1" \
                 --name "$5" \
-                --function-version "\$LATEST"); 
+                --function-version "$version"); 
     then
         echo "Error while creating lambda function"
         exit 1
