@@ -2,7 +2,7 @@ declare -A app_back_asg
 
 app_back_asg[name]="$prefix-back-asg"
 app_back_asg[min]=1
-app_back_asg[max]=1
+app_back_asg[max]=5
 app_back_asg[subnets]="${subnet_private_1[id]},${subnet_private_2[id]}"
 
 
@@ -10,7 +10,7 @@ declare -A app_front_asg
 
 app_front_asg[name]="$prefix-front-asg"
 app_front_asg[min]=1
-app_front_asg[max]=1
+app_front_asg[max]=3
 app_front_asg[subnets]="${subnet_private_1[id]},${subnet_private_2[id]}"
 
 

@@ -65,15 +65,15 @@
 
 - **AWS CLI** installed and configured (`aws configure`)
 - **AWS user / IAM role** with permissions to all services used by the scripts:
-  - EC2, VPC, ELB (NLB), Auto Scaling
+  - EC2, VPC, ELB, Auto Scaling
   - RDS, S3, SQS, SNS, Lambda
   - CloudFront, Route53, ACM
-  - IAM (create roles, attach policies)
+  - IAM, STS
   - CodeBuild, CodeDeploy, CodePipeline, CodeConnections
   - Secrets Manager, SSM Parameter Store
-  - CloudWatch Logs, STS (`GetCallerIdentity`)
+  - CloudWatch
 
-> The deploying user must have sufficient permissions to create and manage all of the above services. In a real project you would scope these carefully; for a learning environment `AdministratorAccess` on a dedicated AWS account is the simplest approach.
+> The deploying user must have sufficient permissions to create and manage all of the above services.
 
 ### Deploy
 
@@ -84,19 +84,20 @@ cd scripts
 # 2. Make the deploy script executable
 chmod +x ./deploy.sh
 
-# 3. Run for your target environment (prod or dev)
-./deploy.sh prod
-# or
-./deploy.sh dev
+# 3. Run for your target environment (prod | dev | staging | qc)
+./deploy.sh "$env"
+
 ```
 
-The script provisions the entire stack in the correct dependency order — approximately 21 sequential phases from VPC to CloudFront. It is fully idempotent: re-running it on an existing environment is safe and will skip resources that already exist.
+The script provisions the entire stack in the correct dependency order. It is fully idempotent: re-running it on an existing environment is safe and will skip resources that already exist.
 
 ---
 
 ## About This Project
 
 Pixlize is a **learning project** built by a backend engineer to gain hands-on experience with AWS and DevOps. The application — an async image processing platform — is the vehicle for practicing real-world infrastructure patterns. The focus is on the **infrastructure and CI/CD**, not the application logic.
+
+The backend (NestJS), frontend (React), and Lambda (Python) are **vibe coded**  they exist purely to provide a realistic, working application to deploy and operate on AWS. The real work and learning is entirely in the infrastructure and DevOps layer.
 
 **Why AWS CLI instead of Terraform?**
 Terraform and CDK are great for production teams, but they abstract away the underlying API calls. Using AWS CLI directly forces you to understand what each resource actually does, what parameters it needs, in what order things must be created, and how services depend on each other. This is far more educational for someone learning AWS from scratch.
@@ -124,7 +125,7 @@ Pixlize is an async image processing SaaS. Users upload images, submit processin
 | `pixlize-back` | NestJS REST API + WebSocket server | [github.com/MohamedAlkady65/pixlize-back](https://github.com/MohamedAlkady65/pixlize-back) |
 | `pixlize-front` | React SPA (user interface) | [github.com/MohamedAlkady65/pixlize-front](https://github.com/MohamedAlkady65/pixlize-front) |
 | `lambda` | Python image processor (AWS Lambda) | [github.com/MohamedAlkady65/pixlize-lambda](https://github.com/MohamedAlkady65/pixlize-lambda) |
-| `pixlize-infra` | This repo — all AWS infrastructure scripts | — |
+| `pixlize-infra` | This repo — all AWS infrastructure scripts | [github.com/MohamedAlkady65/pixlize-infra](https://github.com/MohamedAlkady65/pixlize-infra) |
 
 ### Tech Stack
 
@@ -220,31 +221,38 @@ jobs
 
 ## Docker & Containerization
 
-All three application components are containerized. EC2 instances run the application entirely inside Docker containers — no bare-metal process management.
-
-### Backend
-- **Base image:** `node:20-alpine`
-- **Build:** NestJS app compiled inside container
-- **Delivery:** CodeBuild saves the image as a `.tar` file in S3 (pipeline artifact), CodeDeploy transfers it to EC2, loads it with `docker load`, and runs the container mapping port `3000` (internal) → `80` (host)
-- **Config:** `.env` file built at instance startup from SSM Parameter Store and Secrets Manager values
-
-### Frontend
-- **Multi-stage build:**
-  - Stage 1: `node` builder — runs `vite build`, outputs `/dist`
-  - Stage 2: `nginx:alpine` — copies `/dist`, applies SPA fallback config (`try_files $uri $uri/ /index.html`)
-- **Delivery:** Same CodeBuild → tar → CodeDeploy → `docker load` → `docker run` pattern
-- **Port:** 80
-
-### Lambda
-- **Base image:** `python:3.12` (used as a **build environment**, not a runtime container)
-- **Build:** Docker container installs dependencies (`pip install` Pillow, boto3), runs `build.sh` to compile and extract Lambda code, zips the output as `function.zip`
-- **Delivery:** CodeBuild pushes the zip directly to Lambda via `aws lambda update-function-code`, then publishes a new version
+All three application components are containerized. EC2 instances run the application entirely inside Docker containers
 
 ---
 
 ## AWS Infrastructure
 
 > **Note:** The infrastructure decisions in this project are made to maximize **learning exposure** across as many AWS services and patterns as possible — not to be a production-ready, cost-optimized, or highly-available system. Some choices would be made differently in a real production environment.
+
+### AWS Services Used
+
+| # | Service | Purpose |
+|---|---------|---------|
+| 1 | **VPC** | Isolated network with public, private, and isolated subnets |
+| 2 | **EC2** | Compute for backend and frontend (via Auto Scaling Groups) |
+| 3 | **Auto Scaling** | Manages EC2 instance lifecycle and launch templates |
+| 4 | **Elastic Load Balancing (NLB)** | TLS termination and traffic distribution to EC2 instances |
+| 5 | **RDS (MySQL)** | Relational database for users, images, and jobs |
+| 6 | **S3** | Object storage for user images and CI/CD pipeline artifacts |
+| 7 | **Lambda** | Serverless image processing triggered by SQS |
+| 8 | **SQS** | Message queue for async job dispatch from backend to Lambda |
+| 9 | **SNS** | Pub/sub notifications from Lambda back to the backend webhook |
+| 10 | **CloudFront** | CDN for frontend delivery and private S3 image serving |
+| 11 | **Route53** | DNS hosted zone and alias records for all domains |
+| 12 | **ACM** | TLS certificates for NLB listeners and CloudFront distributions |
+| 13 | **IAM** | Roles and least-privilege policies for every service |
+| 14 | **Secrets Manager** | Encrypted storage for DB password and JWT secret |
+| 15 | **SSM Parameter Store** | App config injection into EC2 instances at boot |
+| 16 | **CodePipeline** | Orchestrates the CI/CD pipeline for each repo |
+| 17 | **CodeBuild** | Builds Docker images and Lambda packages |
+| 18 | **CodeDeploy** | Deploys to EC2 (in-place) and Lambda (blue/green) |
+| 19 | **CodeConnections** | GitHub OAuth integration for pipeline source stage |
+| 20 | **CloudWatch Logs** | Build and application logs from CodeBuild and Lambda |
 
 ### Region & Environments
 
@@ -260,15 +268,15 @@ All three application components are containerized. EC2 instances run the applic
 VPC: 10.0.0.0/16  (pixlize-{env}-vpc)
 │
 ├── Public Subnets (internet-facing via IGW)
-│   ├── public-1  10.0.1.0/24  eu-west-3a  ← NLBs, NAT Gateway EIP
+│   ├── public-1  10.0.1.0/24  eu-west-3a  ← NLBs, NAT Gateway
 │   └── public-2  10.0.2.0/24  eu-west-3b  ← NLBs
 │
 ├── Private Subnets (outbound via NAT)
-│   ├── private-1  10.0.3.0/24  eu-west-3a  ← EC2 (backend ASG)
-│   └── private-2  10.0.4.0/24  eu-west-3b  ← EC2 (frontend ASG)
+│   ├── private-1  10.0.3.0/24  eu-west-3a  ← EC2 (backend, frontend ASG)
+│   └── private-2  10.0.4.0/24  eu-west-3b  ← EC2 (backend, frontend ASG)
 │
 └── Isolated Subnets (no internet access)
-    ├── private-3  10.0.5.0/24  eu-west-3a  ← RDS
+    ├── private-3  10.0.5.0/24  eu-west-3a  ← RDS subnet group
     └── private-4  10.0.6.0/24  eu-west-3b  ← RDS subnet group
 
 Gateways:
@@ -287,7 +295,7 @@ Route Tables:
 |---------------|-------------|-------|
 | `{prefix}-app-back-end` | TCP 80 from `0.0.0.0/0` | Backend EC2 instances; NLB forwards here |
 | `{prefix}-load-balancer-back-end` | TCP 443 from `0.0.0.0/0` | Backend NLB; terminates TLS |
-| `{prefix}-app-front-end` | TCP 80 from CloudFront prefix list `pl-75b1541c` | Frontend EC2; only CloudFront IPs allowed |
+| `{prefix}-app-front-end` | TCP 80 from `0.0.0.0/0` | Front EC2 instances; NLB forwards here |
 | `{prefix}-load-balancer-front-end` | TCP 443 from CloudFront prefix list `pl-75b1541c` | Frontend NLB; only CloudFront IPs |
 | `{prefix}-db` | TCP 3306 from `{prefix}-app-back-end` SG | RDS MySQL; backend only, no public access |
 
@@ -302,12 +310,11 @@ Two Auto Scaling Groups manage EC2 instances for backend and frontend independen
 | AMI | `ami-0be40a46b4111e7f5` (Ubuntu) | same |
 | Instance type | `t2.medium` | `t2.medium` |
 | Subnets | `private-1`, `private-2` | `private-1`, `private-2` |
-| Min / Max / Desired | 1 / 1 / 1 | 1 / 1 / 1 |
+| Min / Max / Desired | 1 / 1 / 5 | 1 / 1 / 3 |
 | Health check grace | 600 seconds | 600 seconds |
 | Security group | `app-back-end` | `app-front-end` |
 
 **Launch Template configuration:**
-- IMDSv2 enforced (`HttpTokens: required`, `HttpPutResponseHopLimit: 2`)
 - Root volume: 15 GB gp3
 - EC2 key pairs stored in `~/{app}_key_pairs/`
 
@@ -442,6 +449,8 @@ Two distributions serve different origins:
 **Environment domains:**
 - Prod: `pixlize.alkady.link`, `api.pixlize.alkady.link`, `bucket.pixlize.alkady.link`
 - Dev: `pixlize.dev.alkady.link`, `api.pixlize.dev.alkady.link`, `bucket.pixlize.dev.alkady.link`
+- Staging: `pixlize.staging.alkady.link`, `api.pixlize.staging.alkady.link`, `bucket.pixlize.staging.alkady.link`
+- QC: `pixlize.qc.alkady.link`, `api.pixlize.qc.alkady.link`, `bucket.pixlize.qc.alkady.link`
 
 Certificate validation CNAME records are also automatically created in Route53 during ACM provisioning.
 
@@ -619,26 +628,6 @@ The single `deploy.sh` script provisions the full stack in this exact order (eac
 20.  SNS HTTPS Subscription → backend webhook
 21.  CloudFront Distributions (frontend + S3 bucket)
 ```
-
----
-
-## Key Architectural Patterns
-
-**Idempotent scripts** — Every function checks whether the resource already exists before attempting to create it. Running `deploy.sh` multiple times is safe — it picks up from where it left off without duplicating resources.
-
-**Multi-environment from one codebase** — Switching between dev, staging, qc, and prod is a single argument: `./deploy.sh prod`. Config files handle domain names, branch names, database names, and resource prefixes.
-
-**Private compute** — EC2 instances have no public IP addresses. They live in private subnets and can reach the internet only via the NAT Gateway. All inbound traffic goes through the NLB.
-
-**CloudFront as the only public frontend entry** — The frontend NLB's security group uses the AWS-managed CloudFront IP prefix list (`pl-75b1541c`), blocking all direct access. Users can only reach the frontend through CloudFront.
-
-**Blue/Green Lambda deployments** — Lambda deploys shift traffic to the new version via the `live` alias. CodeDeploy controls the traffic shift, making rollback possible.
-
-**IMDSv2 enforced** — All EC2 instances require IMDSv2 (`HttpTokens: required`, `HttpPutResponseHopLimit: 2`). Instance metadata is not accessible via the older unauthenticated IMDSv1 endpoint.
-
-**Zero hardcoded secrets** — Database passwords and JWT secrets never appear in scripts or code. They are generated and stored in Secrets Manager and injected into `.env` at instance startup via user data.
-
-**Event-driven async processing** — Image processing is fully async. The backend never waits for processing to complete — it queues a job and returns immediately. Lambda workers process independently and notify via SNS → WebSocket.
 
 ---
 

@@ -15,6 +15,12 @@ case "$env_arg" in
   dev)
     source ./config/config.dev.sh
     ;;
+  staging)
+    source ./config/config.staging.sh
+    ;;
+  qc)
+    source ./config/config.qc.sh
+    ;;
   *)
     echo "Error: invalid environment '$env_arg'" >&2
     echo "Usage: $0 {prod|dev}" >&2

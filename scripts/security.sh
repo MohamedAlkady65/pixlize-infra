@@ -144,7 +144,7 @@ print_sperator
 add_in_rules_to_security_group "${sg_load_balancer_back_end[id]}" "IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges=[{CidrIp=0.0.0.0/0}]"
 
 print_sperator
-add_in_rules_to_security_group "${sg_app_front_end[id]}" "IpProtocol=tcp,FromPort=80,ToPort=80,PrefixListIds=[{PrefixListId=pl-75b1541c}]"
+add_in_rules_to_security_group "${sg_app_front_end[id]}" "IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges=[{CidrIp=0.0.0.0/0}]"
 
 print_sperator
 
