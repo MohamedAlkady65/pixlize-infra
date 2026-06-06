@@ -10,27 +10,22 @@
 
 declare -A sg_app_front_end=(
   [name]="$prefix-app-front-end"
-  [inrules]="IpProtocol=all,IpRanges=[{CidrIp=0.0.0.0/0}]"
 )
 
 declare -A sg_app_back_end=(
   [name]="$prefix-app-back-end"
-  [inrules]="IpProtocol=all,IpRanges=[{CidrIp=0.0.0.0/0}]"
 )
 
 declare -A sg_load_balancer_front_end=(
   [name]="$prefix-load-balancer-front-end"
-  [inrules]="IpProtocol=all,IpRanges=[{CidrIp=0.0.0.0/0}]"
 )
 
 declare -A sg_load_balancer_back_end=(
   [name]="$prefix-load-balancer-back-end"
-  [inrules]="IpProtocol=all,IpRanges=[{CidrIp=0.0.0.0/0}]"
 )
 
 declare -A sg_db=(
   [name]="$prefix-db"
-  [inrules]="IpProtocol=all,IpRanges=[{CidrIp=0.0.0.0/0}]"
 )
 
 
