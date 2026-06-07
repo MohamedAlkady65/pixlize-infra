@@ -6,7 +6,7 @@
 
 ## Demo
 
-[<video src="./assets/app_demo.mp4" controls width="100%"></video>]
+![Demo](./assets/app_demo.mp4)
 
 ---
 ## Architecture Diagram
