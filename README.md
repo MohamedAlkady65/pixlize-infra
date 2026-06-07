@@ -6,17 +6,12 @@
 
 ## Demo
 
-<!-- Add a screen recording or video walkthrough here -->
-> **Video:** _(coming soon — application walkthrough and deployment demo)_
+<video src="./assets/app_demo.mp4" controls width="100%"></video>
 
 ---
-
 ## Architecture Diagram
 
-<!-- Replace with your actual AWS architecture diagram image -->
-> **Diagram:** _(coming soon)_
->
-> ![Architecture Diagram](./docs/architecture.png)
+![Architecture Diagram](./assets/aws_architecture.drawio.svg)
 
 ---
 
