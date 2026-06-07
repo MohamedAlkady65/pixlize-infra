@@ -1,7 +1,3 @@
-
-
-https://github.com/user-attachments/assets/330bacd7-e76c-4127-995f-cdbe6d183ff7
-
 # Pixlize — AWS Infrastructure & DevOps
 
 > **Learning Project** — Built to practice AWS and DevOps hands-on. The infrastructure is intentionally provisioned using **AWS CLI + Bash scripts** instead of Terraform or CDK, so every API call, every resource dependency, and every AWS concept is learned directly — not hidden behind an abstraction layer.
@@ -10,7 +6,7 @@ https://github.com/user-attachments/assets/330bacd7-e76c-4127-995f-cdbe6d183ff7
 
 ## Demo
 
-![Demo](./assets/app_demo.mp4)
+https://github.com/user-attachments/assets/330bacd7-e76c-4127-995f-cdbe6d183ff7
 
 ---
 ## Architecture Diagram
